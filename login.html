@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تسجيل الدخول - ساعتي</title>
+  <style>
+    body {
+      font-family: "Cairo", sans-serif;
+      background: #f6f8fb;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 26px rgba(15,23,42,.1);
+      padding: 20px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .btn-main { background: #3b82f6; color: white; }
+    .btn-main:hover { background: #2563eb; }
+
+    .btn-google {
+      background: white;
+      border: 1px solid #ccc;
+      color: #333;
+      display: flex;
+      justify-content:center;
+      align-items:center;
+      gap:6px;
+    }
+
+    .btn-skip { background: #f3f4f6; }
+
+    .error {
+      background:#fee2e2;
+      color:#991b1b;
+      border-radius:8px;
+      padding:8px;
+      margin:8px 0;
+      font-size:14px;
+      display:none;
+    }
+
+    .footer-link {
+      margin-top:12px;
+      font-size:13px;
+    }
+
+    .footer-link a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>تسجيل الدخول</h2>
+    <p>سجّل دخولك أو أنشئ حسابًا جديدًا لمزامنة بياناتك عبر الأجهزة.</p>
+
+    <div id="errorBox" class="error"></div>
+
+    <input id="email" type="email" placeholder="البريد الإلكتروني" />
+    <input id="password" type="password" placeholder="كلمة المرور" />
+
+    <button id="loginBtn" class="btn-main">دخول</button>
+    <button id="signupBtn" class="btn-skip">إنشاء حساب جديد</button>
+    <button id="googleBtn" class="btn-google">
+      <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="18" />
+      دخول باستخدام Google
+    </button>
+    <button id="skipBtn" class="btn-skip">تخطي الآن</button>
+
+    <p class="footer-link">← <a href="index.html">العودة للتطبيق</a></p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import {
+      getAuth,
+      setPersistence,
+      browserLocalPersistence,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      GoogleAuthProvider,
+      signInWithPopup
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+    // 🔧 إعدادات Firebase الخاصة بك
+    const firebaseConfig = {
+      apiKey: "AIzaSyBpzQ4GRDzdYCuMvsj3rrWN8Ck0GLHiB2g",
+      authDomain: "saaati-pro.firebaseapp.com",
+      projectId: "saaati-pro",
+      storageBucket: "saaati-pro.firebasestorage.app",
+      messagingSenderId: "719485178559",
+      appId: "1:719485178559:web:56460b57bb0560d8496c0a",
+      measurementId: "G-2KBHPQP07X"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    await setPersistence(auth, browserLocalPersistence);
+    const provider = new GoogleAuthProvider();
+
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const errorBox = document.getElementById("errorBox");
+    const loginBtn = document.getElementById("loginBtn");
+    const signupBtn = document.getElementById("signupBtn");
+    const googleBtn = document.getElementById("googleBtn");
+    const skipBtn = document.getElementById("skipBtn");
+
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.style.display = "block";
+      setTimeout(() => (errorBox.style.display = "none"), 4000);
+    }
+
+    // 🔹 تسجيل الدخول بالبريد
+    loginBtn.onclick = async () => {
+      try {
+        const email = emailInput.value.trim();
+        const pass = passwordInput.value.trim();
+        await signInWithEmailAndPassword(auth, email, pass);
+        window.location.href = "index.html";
+      } catch (err) {
+        showError("خطأ في تسجيل الدخول: " + err.code);
+      }
+    };
+
+    // 🔹 إنشاء حساب جديد
+    signupBtn.onclick = async () => {
+      try {
+        const email = emailInput.value.trim();
+        const pass = passwordInput.value.trim();
+        await createUserWithEmailAndPassword(auth, email, pass);
+        alert("تم إنشاء الحساب بنجاح ✅");
+        window.location.href = "index.html";
+      } catch (err) {
+        showError("خطأ في إنشاء الحساب: " + err.code);
+      }
+    };
+
+    // 🔹 تسجيل الدخول عبر Google
+    googleBtn.onclick = async () => {
+      try {
+        await signInWithPopup(auth, provider);
+        window.location.href = "index.html";
+      } catch (err) {
+        showError("خطأ في تسجيل الدخول بـ Google: " + err.code);
+      }
+    };
+
+    // 🔹 تخطي الدخول
+    skipBtn.onclick = () => {
+      window.location.href = "index.html";
+    };
+  </script>
+</body>
+</html>
