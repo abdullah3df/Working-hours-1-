@@ -20,6 +20,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto 
 .lang-flags{display:flex;gap:6px;align-items:center}
 .btn-flag{width:36px;height:36px;padding:0;font-size:18px;border-radius:10px}
 .btn-flag.active{outline:2px solid var(--accent)}
+.user-pill{font-size:12px;color:var(--muted);white-space:nowrap}
 
 /* Drawer menu */
 .menu-drawer{
@@ -82,6 +83,11 @@ tbody tr{background:#fff;border:1px solid var(--line)}
 .dark tbody tr{background:#0a1222;border-color:#1f2b40}
 tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
 tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
+
+/* Auth modal */
+.auth .dialog{max-width:380px}
+.auth .dialog input{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;padding:8px;margin:6px 0;background:#fff}
+.dark .auth .dialog input{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
 </style>
 </head>
 <body>
@@ -92,6 +98,11 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
     <button id="menuToggle" class="btn-sm" aria-expanded="false">☰ القائمة</button>
     <div class="brand">⏱️ <span id="brandTxt">ساعتي</span></div>
     <div class="spacer"></div>
+
+    <span id="userPill" class="user-pill">غير مسجل</span>
+    <button id="btnOpenAuth" class="btn-sm">تسجيل</button>
+    <button id="btnLogout" class="btn-sm" style="display:none">خروج</button>
+
     <div class="lang-flags">
       <button class="btn-sm btn-flag" data-lang="ar" title="العربية">🇸🇦</button>
       <button class="btn-sm btn-flag" data-lang="en" title="English">🇬🇧</button>
@@ -211,8 +222,25 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   </div>
 </div>
 
+<!-- Auth modal -->
+<div id="authModal" class="modal auth" aria-hidden="true">
+  <div class="dialog">
+    <h2 id="authTitle">تسجيل الدخول</h2>
+    <input id="authEmail" type="email" placeholder="Email">
+    <input id="authPass"  type="password" placeholder="Password">
+    <input id="authName"  type="text" placeholder="Name (للإنشاء فقط)">
+    <div class="actions">
+      <button id="btnSignup" class="btn-sm">إنشاء حساب</button>
+      <button id="btnLogin"  class="btn-sm">دخول</button>
+      <button id="btnCloseAuth" class="btn-sm">إغلاق</button>
+    </div>
+  </div>
+</div>
+
 <!-- html2canvas -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
+
+<!-- ===================== APP SCRIPT ===================== -->
 <script>
 /* ===== I18N ===== */
 const I18N = {
@@ -233,6 +261,10 @@ const mnuMonth=document.getElementById('mnuMonth');
 const mnuSettings=document.getElementById('mnuSettings');
 const mnuExport=document.getElementById('mnuExport');
 const mnuTheme=document.getElementById('mnuTheme');
+
+const btnOpenAuth=document.getElementById('btnOpenAuth');
+const btnLogout=document.getElementById('btnLogout');
+const userPill=document.getElementById('userPill');
 
 const brandTxt=document.getElementById('brandTxt');
 
@@ -306,7 +338,10 @@ function saveSettings(){const s={daily:parseFloat(stDaily.value||8),break:parseI
 function updateDayName(){const lang=getLang(); if(!dayDate.value){dayDate.value=new Date().toISOString().slice(0,10);} try{dayName.textContent=dayNameIntl(new Date(dayDate.value),lang);}catch{dayName.textContent='—';}}
 function compute(){const base=Math.round(parseFloat(stDaily.value||8)*60); const s=dayStart.value,e=dayEnd.value,br=parseInt(dayBreak.value||0,10); if(!s||!e){dNet.textContent='0:00'; dOT.textContent='0:00'; return;} let sm=h2m(s), em=h2m(e); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-br); const ot=Math.max(0,net-base); dNet.textContent=m2h(net); dOT.textContent=m2h(ot); dBase.textContent=String(stDaily.value||8);}
 function notifySaved(){const lang=getLang(); dSave.textContent=I18N[lang].day.saved; setTimeout(()=>dSave.textContent='—',1500);}
-function saveDayLocal(){const p={date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}; localStorage.setItem('day-'+p.date,JSON.stringify(p)); notifySaved();}
+
+/* ==== Local + Cloud Save ==== */
+function buildDayObj(){return {date:dayDate.value,start:dayStart.value||"",end:dayEnd.value||"",break:parseInt(dayBreak.value||0,10)};}
+function saveDayLocal(){const p=buildDayObj(); localStorage.setItem('day-'+p.date,JSON.stringify(p)); notifySaved(); if(window.cloud?.user) saveDayCloud(p);}
 function loadDay(){const raw=localStorage.getItem('day-'+dayDate.value); if(raw){try{const p=JSON.parse(raw); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=p.break??(stBreak.value||30);}catch{dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30;}} else {dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30;} compute();}
 
 /* Month */
@@ -372,6 +407,10 @@ function initApp(){
   mnuMonth.onclick=()=>{openMonth(); menuDrawer.classList.remove('open');};
   mnuExport.onclick=()=>{openExport(); menuDrawer.classList.remove('open');};
 
+  // Auth modal open/close
+  btnOpenAuth.onclick = ()=>{authModal.classList.add('open'); authModal.setAttribute('aria-hidden','false');}
+  btnCloseAuth.onclick = ()=>{authModal.classList.remove('open'); authModal.setAttribute('aria-hidden','true');}
+
   // Flags
   document.querySelectorAll('.btn-flag').forEach(b=>b.addEventListener('click',()=>{setLang(b.dataset.lang); setActiveLangUI(b.dataset.lang);} ));
   setActiveLangUI(currentLang);
@@ -398,6 +437,114 @@ function initApp(){
   compute();
 }
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initApp);}else{initApp();}
+</script>
+
+<!-- =========== Firebase (CDN) + Auth + Firestore =========== -->
+<script type="module">
+  // Firebase CDN
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics.js";
+  import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+  // مشروعك
+  const firebaseConfig = {
+    apiKey: "AIzaSyBpzQ4GRDzdYCuMvsj3rrWN8Ck0GLHiB2g",
+    authDomain: "saaati-pro.firebaseapp.com",
+    projectId: "saaati-pro",
+    storageBucket: "saaati-pro.appspot.com",
+    messagingSenderId: "719485178559",
+    appId: "1:719485178559:web:56460b57bb0560d8496c0a",
+    measurementId: "G-2KBHPQP07X"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+  try { getAnalytics(app); } catch {}
+
+  // عناصر الواجهة الخاصة بالمصادقة
+  const authModal   = document.getElementById('authModal');
+  const authEmail   = document.getElementById('authEmail');
+  const authPass    = document.getElementById('authPass');
+  const authName    = document.getElementById('authName');
+  const btnLogin    = document.getElementById('btnLogin');
+  const btnSignup   = document.getElementById('btnSignup');
+  const btnLogoutEl = document.getElementById('btnLogout');
+  const btnOpenAuthEl = document.getElementById('btnOpenAuth');
+
+  // دوال سحابية
+  async function saveUserProfile(uid, data){
+    await setDoc(doc(db, "users", uid), { ...data, updatedAt: Date.now() }, { merge: true });
+  }
+  async function saveDayCloud(day){
+    if(!auth.currentUser) return;
+    const uid = auth.currentUser.uid;
+    await setDoc(doc(db, "users", uid, "days", day.date), day, { merge: true });
+  }
+  async function loadDayCloud(date){
+    if(!auth.currentUser) return null;
+    const uid = auth.currentUser.uid;
+    const snap = await getDoc(doc(db, "users", uid, "days", date));
+    return snap.exists() ? snap.data() : null;
+  }
+  async function syncLocalToCloudOnce(){
+    if(!auth.currentUser) return;
+    const doneKey = "synced_"+auth.currentUser.uid;
+    if(localStorage.getItem(doneKey)==="1") return;
+    for(const key of Object.keys(localStorage)){
+      if(!key.startsWith('day-')) continue;
+      try{ const d=JSON.parse(localStorage.getItem(key)); if(d?.date) await saveDayCloud(d);}catch{}
+    }
+    localStorage.setItem(doneKey,"1");
+  }
+
+  // أحداث الأزرار
+  btnLogin.onclick = async ()=>{
+    try{
+      await signInWithEmailAndPassword(auth, authEmail.value.trim(), authPass.value);
+      authModal.classList.remove('open');
+    }catch(e){ alert('Login error: '+e.message); }
+  };
+  btnSignup.onclick = async ()=>{
+    try{
+      const cred = await createUserWithEmailAndPassword(auth, authEmail.value.trim(), authPass.value);
+      await saveUserProfile(cred.user.uid, { email: cred.user.email, displayName: authName.value || "User" });
+      authModal.classList.remove('open');
+    }catch(e){ alert('Signup error: '+e.message); }
+  };
+  btnLogoutEl.onclick = async ()=>{ await signOut(auth); };
+
+  // راقب حالة المستخدم
+  onAuthStateChanged(auth, async (user)=>{
+    if(user){
+      window.cloud = { user, saveDayCloud, loadDayCloud };
+      userPill.textContent = user.email || 'User';
+      btnOpenAuthEl.style.display='none';
+      btnLogoutEl.style.display='inline-block';
+      // مزامنة أولية ثم محاولة تحميل يوم التاريخ الحالي إن لم يكن محليًا
+      await syncLocalToCloudOnce();
+      const today = document.getElementById('dayDate').value || new Date().toISOString().slice(0,10);
+      const local = localStorage.getItem('day-'+today);
+      if(!local){
+        const cloudDay = await loadDayCloud(today);
+        if(cloudDay){
+          localStorage.setItem('day-'+today, JSON.stringify(cloudDay));
+          // حدّث الحقول
+          document.getElementById('dayStart').value = cloudDay.start || '';
+          document.getElementById('dayEnd').value   = cloudDay.end   || '';
+          document.getElementById('dayBreak').value = cloudDay.break ?? 30;
+          // أعد الحساب
+          const evt = new Event('input'); document.getElementById('dayEnd').dispatchEvent(evt);
+        }
+      }
+    }else{
+      window.cloud = null;
+      userPill.textContent = 'غير مسجل';
+      btnOpenAuthEl.style.display='inline-block';
+      btnLogoutEl.style.display='none';
+    }
+  });
 </script>
 </body>
 </html>
