@@ -452,7 +452,7 @@ function setLang(lang){
   // Nav
   menuToggle.textContent=L.nav.menu;
   mnuDay.textContent=L.nav.day; mnuMonth.textContent=L.nav.month; mnuSettings.textContent=L.nav.settings; mnuExport.textContent=L.nav.export;
-  // Auth btn
+  // Auth
   authBtn.textContent=(auth.currentUser?(lang==='de'?'Abmelden':lang==='ar'?'تسجيل الخروج':'Sign out'):(lang==='de'?'Anmelden':lang==='ar'?'تسجيل':'Sign in'));
   // Day
   titleDay.textContent=L.day.title; hintDay.textContent=L.day.hint; lblDate.textContent=L.day.date; lblStart.textContent=L.day.start; lblEnd.textContent=L.day.end; lblBreak.textContent=L.day.break; k1.textContent=L.day.k1; k2.textContent=L.day.k2; k3.textContent=L.day.k3; k4.textContent=L.day.k4;
@@ -491,7 +491,7 @@ function showCard(card){[dayCard,settingsCard].forEach(el=>el.style.display='non
 function openExport(){exportModal.classList.add('open'); exportModal.setAttribute('aria-hidden','false');}
 
 function initApp(){
-  // Ensure default EN at first load if not set
+  // Force default EN on first visit
   if(!localStorage.getItem(LS_LANG)){ localStorage.setItem(LS_LANG,'en'); currentLang='en'; }
   // Date init
   try{dayDate.valueAsDate=new Date();}catch{dayDate.value=new Date().toISOString().slice(0,10);}
@@ -504,7 +504,7 @@ function initApp(){
     menuToggle.setAttribute('aria-expanded',String(willOpen));
   };
 
-  // Global click: close drawer and lang menu if clicking outside
+  // ===== Global click: close outside (drawer + lang menu)
   window.addEventListener('click',(e)=>{
     if(!menuDrawer.contains(e.target) && !menuToggle.contains(e.target)){
       menuDrawer.classList.remove('open');
@@ -517,17 +517,14 @@ function initApp(){
     }
   });
 
-  // Prevent bubbling to window for lang elements
+  // ===== Language dropdown events (prevent immediate close)
   langBtn.addEventListener('click',(e)=>{e.stopPropagation();});
   langMenu.addEventListener('click',(e)=>{e.stopPropagation();});
-
-  // Open/close language menu
   langBtn.addEventListener('click',()=>{
     const willOpen=!langMenu.classList.contains('open');
     langMenu.classList.toggle('open',willOpen);
     langBtn.setAttribute('aria-expanded', String(willOpen));
   });
-  // Language options
   langMenu.querySelectorAll('.lang-opt').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const lang=btn.dataset.lang;
@@ -560,7 +557,7 @@ function initApp(){
     exportModal.classList.remove('open');
   });
 
-  // Initial apply language (EN default)
+  // Initial
   setLang(currentLang);
   loadSettings();
   loadDay();
