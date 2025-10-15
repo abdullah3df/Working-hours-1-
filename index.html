@@ -63,7 +63,7 @@ input:checked + .slider{background:#60a5fa}
 input:checked + .slider::before{content:"☀️"; transform:translateX(24px)}
 
 /* Layout */
-.wrap{max-width:980px;margin:18px auto 110px;padding:12px}
+.wrap{max-width:980px;margin:18px auto 48px;padding:12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
 h1{margin:0 0 8px;font-size:22px}
 p.small{color:var(--muted);margin:0 0 12px}
@@ -97,10 +97,8 @@ input[type="date"], input[type="time"]{direction:ltr;text-align:center}
 .dark .kcard{background:#0a1222;border-color:#1f2b40;color:#e5e7eb}
 .kcard h3{margin:0;color:var(--muted);font-size:13px}
 .kcard .val{font-size:20px;font-weight:800;margin-top:4px}
-.val-pos{color:#16a34a}
-.val-neg{color:#ef4444}
 
-/* Day annotations (status + notes) */
+/* Day annotations */
 .annot-grid{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-top:12px}
 @media (max-width:720px){.annot-grid{grid-template-columns:1fr}}
 .form-field label{display:block;color:var(--muted);font-size:13px;margin:0 0 6px}
@@ -108,7 +106,7 @@ input[type="date"], input[type="time"]{direction:ltr;text-align:center}
 .textarea{min-height:70px;resize:vertical}
 .dark .select, .dark .textarea{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
 
-/* Modals (month/export) */
+/* Modals (month/export/confirm) */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:80}
 .modal.open{display:flex}
 .dialog{background:var(--card);border:1px solid var(--line);border-radius:16px;max-width:920px;width:100%;padding:16px;max-height:85vh;overflow:auto;box-shadow:var(--shadow)}
@@ -122,28 +120,11 @@ tbody tr{background:#fff;border:1px solid var(--line)}
 tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
 tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 
-/* Notes table inside month modal */
-.note-table th{font-size:12px;color:#334155}
-.note-table td, .note-table th{padding:8px 10px;text-align:start}
-.badge-note{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:#f8fafc;font-weight:700;font-size:12px}
-.dark .badge-note{background:#0e1528;border-color:#1f2b40;color:#e5e7eb}
-
-/* Bottom balance bar */
-.bottom-bar{
-  position:fixed; left:0; right:0; bottom:0; z-index:65;
-  display:flex; justify-content:center;
-  padding:10px 12px; border-top:1px solid var(--line);
-  background:color-mix(in srgb, var(--card) 94%, transparent); backdrop-filter:blur(10px);
-}
-.balance-chip{
-  display:inline-flex; align-items:center; gap:10px;
-  padding:10px 14px; border-radius:999px; font-weight:900; letter-spacing:.2px;
-  border:1px solid var(--line); background:var(--card); box-shadow:var(--shadow);
-}
-.badge{padding:4px 8px; border-radius:999px; font-size:12px; font-weight:700}
-.badge.ok{color:#065f46;background:rgba(16,185,129,.18);border:1px solid rgba(16,185,129,.35)}
-.badge.bad{color:#7f1d1d;background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.35)}
-.balance-btn{height:32px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);cursor:pointer}
+/* Confirm Save Modal */
+.confirm-dialog{max-width:520px}
+.confirm-body{color:var(--muted);line-height:1.5}
+.btn-primary{background:#3b82f6;color:#fff;border-color:#3b82f6}
+.btn-danger{background:#f3f4f6;color:#0f172a}
 
 /* Toast */
 .toast{
@@ -155,13 +136,7 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 }
 .toast.show{ opacity:1; transform: translateY(0) }
 
-/* Confirm Save Modal (new) */
-.confirm-dialog{max-width:520px}
-.confirm-body{color:var(--muted);line-height:1.5}
-.btn-primary{background:#3b82f6;color:#fff;border-color:#3b82f6}
-.btn-danger{background:#f3f4f6;color:#0f172a}
-
-/* Animations */
+/* Animations + focus */
 .card, .dialog, .menu-drawer{transition: box-shadow .25s ease, transform .25s ease, background .25s ease, border-color .25s ease;}
 @media (prefers-reduced-motion: no-preference){
   .card{ animation: fadeUp .25s ease both; }
@@ -177,9 +152,8 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   border-radius: 12px;
 }
 
-/* Mobile */
 @media (max-width:720px){.topbar .inner{grid-template-columns:auto 1fr auto}.wrap{padding:10px}}
-@media (max-width:420px){.btn{height:36px;padding:5px 10px}.wrap{margin-bottom:110px}}
+@media (max-width:420px){.btn{height:36px;padding:5px 10px}.wrap{margin-bottom:48px}}
 </style>
 </head>
 <body>
@@ -285,12 +259,12 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
       </div>
     </div>
 
+    <!-- KPIs -->
     <div class="kpis">
       <div class="kcard"><h3 id="k1">Net Today</h3><div class="val" id="dNet">0:00</div></div>
+      <div class="kcard"><h3 id="kWorkTitle">عدد ساعات العمل</h3><div class="val" id="dWorkHours">0:00</div></div>
       <div class="kcard"><h3 id="k2">Overtime</h3><div class="val" id="dOT">0:00</div></div>
       <div class="kcard"><h3 id="k3">Daily Base (h)</h3><div class="val" id="dBase">8</div></div>
-      <!-- Replaced Save Status with Balance KPI -->
-      <div class="kcard"><h3 id="k4">Balance</h3><div class="val" id="kBalance">+0:00</div></div>
     </div>
   </div>
 
@@ -321,9 +295,7 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
       <button id="refreshMonth" class="btn">Refresh</button>
     </div>
     <div id="monthArea" style="margin-top:12px"></div>
-
     <div id="notesArea" style="margin-top:16px"></div>
-
     <div class="kpis">
       <div class="kcard"><h3 id="mk1">Month Total</h3><div class="val" id="mTotal">0:00</div></div>
       <div class="kcard"><h3 id="mk2">Logged Days</h3><div class="val" id="mDays">0</div></div>
@@ -374,7 +346,7 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   </div>
 </div>
 
-<!-- Confirm Save Modal (NEW) -->
+<!-- Confirm Save Modal -->
 <div id="confirmSaveModal" class="modal" aria-hidden="true">
   <div class="dialog confirm-dialog">
     <h2 id="csTitle">Save changes?</h2>
@@ -383,15 +355,6 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
       <button id="csCancel" class="btn btn-danger">No</button>
       <button id="csOk" class="btn btn-primary">Yes</button>
     </div>
-  </div>
-</div>
-
-<!-- Bottom Balance -->
-<div class="bottom-bar">
-  <div class="balance-chip">
-    <span id="balanceText">Balance</span>
-    <button id="balScopeBtn" class="balance-btn" title="Toggle scope">All</button>
-    <span id="balanceBadge" class="badge ok">+0:00</span>
   </div>
 </div>
 
@@ -422,9 +385,9 @@ await setPersistence(auth, browserLocalPersistence);
 
 /* ================= I18N ================= */
 const I18N = {
-  ar:{dir:'rtl',brand:'ساعتي',nav:{menu:'القائمة',nav:'التنقل',day:'اليوم',month:'الشهري',settings:'الإعدادات',export:'تصدير',pref:'التفضيلات',acct:'الحساب'},day:{title:'الإدخال اليومي',hint:'أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.',date:'تاريخ',start:'🟢 دخول',end:'🔴 خروج',break:'☕️ استراحة (دقيقة)',k1:'صافي اليوم',k2:'إضافي اليوم',k3:'أساس اليوم (س)'},settings:{title:'الإعدادات',hint:'اضبط القيم الافتراضية.',daily:'أساس اليوم (ساعات)',brdef:'استراحة افتراضية (دقيقة)',apply:'حفظ'},month:{title:'ملخص شهري',pick:'اختر الشهر',m1:'مجموع الشهر',m2:'أيام مسجلة',m3:'معدل اليوم',close:'إغلاق',refresh:'تحديث',thead:['التاريخ','البداية','النهاية','استراحة','الصافي','إضافي'],notesTitle:'ملاحظات',notesHead:['التاريخ','الحالة','سبب / ملاحظة','ملاحظة المهمة']},export:{title:'تصدير',scope:'النطاق',format:'الصيغة',optDay:'اليوم',optMonth:'الشهر',optBi:'أسبوعين',png:'صورة (PNG)',json:'JSON',cancel:'إلغاء',do:'تصدير',lang:'لغة التصدير',bwStart:'بداية الأسبوعين'},ui:{dark:'الوضع الداكن',balance:'الرصيد'},status:{label:'حالة اليوم',vals:{work:'عمل',vacation:'إجازة',sick:'مرض',absent:'غياب'},reason:'سبب / ملاحظة',task:'ملاحظة مهمة'},confirm:{title:'حفظ التغييرات؟',body:'قمت بإجراء تعديلات. هل تريد حفظها؟',yes:'نعم',no:'لا'}},
-  en:{dir:'ltr',brand:'Saaati',nav:{menu:'Menu',nav:'Navigation',day:'Day',month:'Monthly',settings:'Settings',export:'Export',pref:'Preferences',acct:'Account'},day:{title:'Daily Entry',hint:'Enter start, end and break. Autosaved locally.',date:'Date',start:'🟢 Clock In',end:'🔴 Clock Out',break:'☕️ Break (min)',k1:'Net Today',k2:'Overtime',k3:'Daily Base (h)'},settings:{title:'Settings',hint:'Adjust defaults.',daily:'Daily Base (hours)',brdef:'Default Break (min)',apply:'Save'},month:{title:'Monthly Summary',pick:'Pick month',m1:'Month Total',m2:'Logged Days',m3:'Avg/Day',close:'Close',refresh:'Refresh',thead:['Date','Start','End','Break','Net','OT'],notesTitle:'Notes',notesHead:['Date','Status','Reason / Note','Task Note']},export:{title:'Export',scope:'Scope',format:'Format',optDay:'Day',optMonth:'Month',optBi:'Two Weeks',png:'Image (PNG)',json:'JSON',cancel:'Cancel',do:'Export',lang:'Export Language',bwStart:'Two Weeks Start'},ui:{dark:'Dark mode',balance:'Balance'},status:{label:'Day Status',vals:{work:'Work',vacation:'Vacation',sick:'Sick',absent:'Absent (Other)'},reason:'Reason / Note',task:'Task Note'},confirm:{title:'Save changes?',body:'You made changes. Do you want to save them?',yes:'Yes',no:'No'}},
-  de:{dir:'ltr',brand:'Meine Stunden',nav:{menu:'Menü',nav:'Navigation',day:'Tag',month:'Monat',settings:'Einstellungen',export:'Export',pref:'Einstellungen',acct:'Konto'},day:{title:'Tägliche Eingabe',hint:'Start, Ende und Pause. Lokal automatisch gespeichert.',date:'Datum',start:'🟢 Einchecken',end:'🔴 Auschecken',break:'☕️ Pause (Min.)',k1:'Netto heute',k2:'Überstunden',k3:'Tages-Soll (Std.)'},settings:{title:'Einstellungen',hint:'Standardwerte anpassen.',daily:'Tages-Soll (Std.)',brdef:'Standardpause (Min.)',apply:'Speichern'},month:{title:'Monatsübersicht',pick:'Monat wählen',m1:'Monatssumme',m2:'Erfasste Tage',m3:'Schnitt/Tag',close:'Schließen',refresh:'Aktualisieren',thead:['Datum','Start','Ende','Pause','Netto','ÜSt'],notesTitle:'Notizen',notesHead:['Datum','Status','Grund / Notiz','Aufgaben-Notiz']},export:{title:'Export',scope:'Bereich',format:'Format',optDay:'Tag',optMonth:'Monat',optBi:'Zwei Wochen',png:'Bild (PNG)',json:'JSON',cancel:'Abbrechen',do:'Exportieren',lang:'Exportsprache',bwStart:'Zwei-Wochen Start'},ui:{dark:'Dunkelmodus',balance:'Saldo'},status:{label:'Tagesstatus',vals:{work:'Arbeit',vacation:'Urlaub',sick:'Krank',absent:'Abwesend'},reason:'Grund / Notiz',task:'Aufgaben-Notiz'},confirm:{title:'Änderungen speichern?',body:'Sie haben Änderungen vorgenommen. Möchten Sie diese speichern?',yes:'Ja',no:'Nein'}}
+  ar:{dir:'rtl',brand:'ساعتي',nav:{menu:'القائمة',nav:'التنقل',day:'اليوم',month:'الشهري',settings:'الإعدادات',export:'تصدير',pref:'التفضيلات',acct:'الحساب'},day:{title:'الإدخال اليومي',hint:'أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.',date:'تاريخ',start:'🟢 دخول',end:'🔴 خروج',break:'☕️ استراحة (دقيقة)',k1:'صافي اليوم',k2:'إضافي اليوم',k3:'أساس اليوم (س)',kWork:'عدد ساعات العمل'},settings:{title:'الإعدادات',hint:'اضبط القيم الافتراضية.',daily:'أساس اليوم (ساعات)',brdef:'استراحة افتراضية (دقيقة)',apply:'حفظ'},month:{title:'ملخص شهري',pick:'اختر الشهر',m1:'مجموع الشهر',m2:'أيام مسجلة',m3:'معدل اليوم',close:'إغلاق',refresh:'تحديث',thead:['التاريخ','البداية','النهاية','استراحة','الصافي','إضافي'],notesTitle:'ملاحظات',notesHead:['التاريخ','الحالة','سبب / ملاحظة','ملاحظة المهمة']},export:{title:'تصدير',scope:'النطاق',format:'الصيغة',optDay:'اليوم',optMonth:'الشهر',optBi:'أسبوعين',png:'صورة (PNG)',json:'JSON',cancel:'إلغاء',do:'تصدير',lang:'لغة التصدير',bwStart:'بداية الأسبوعين'},ui:{dark:'الوضع الداكن'} ,status:{label:'حالة اليوم',vals:{work:'عمل',vacation:'إجازة',sick:'مرض',absent:'غياب'},reason:'سبب / ملاحظة',task:'ملاحظة مهمة'},confirm:{title:'حفظ التغييرات؟',body:'قمت بإجراء تعديلات. هل تريد حفظها؟',yes:'نعم',no:'لا'}},
+  en:{dir:'ltr',brand:'Saaati',nav:{menu:'Menu',nav:'Navigation',day:'Day',month:'Monthly',settings:'Settings',export:'Export',pref:'Preferences',acct:'Account'},day:{title:'Daily Entry',hint:'Enter start, end and break. Autosaved locally.',date:'Date',start:'🟢 Clock In',end:'🔴 Clock Out',break:'☕️ Break (min)',k1:'Net Today',k2:'Overtime',k3:'Daily Base (h)',kWork:'Work Hours'},settings:{title:'Settings',hint:'Adjust defaults.',daily:'Daily Base (hours)',brdef:'Default Break (min)',apply:'Save'},month:{title:'Monthly Summary',pick:'Pick month',m1:'Month Total',m2:'Logged Days',m3:'Avg/Day',close:'Close',refresh:'Refresh',thead:['Date','Start','End','Break','Net','OT'],notesTitle:'Notes',notesHead:['Date','Status','Reason / Note','Task Note']},export:{title:'Export',scope:'Scope',format:'Format',optDay:'Day',optMonth:'Month',optBi:'Two Weeks',png:'Image (PNG)',json:'JSON',cancel:'Cancel',do:'Export',lang:'Export Language',bwStart:'Two Weeks Start'},ui:{dark:'Dark mode'},status:{label:'Day Status',vals:{work:'Work',vacation:'Vacation',sick:'Sick',absent:'Absent (Other)'},reason:'Reason / Note',task:'Task Note'},confirm:{title:'Save changes?',body:'You made changes. Do you want to save them?',yes:'Yes',no:'No'}},
+  de:{dir:'ltr',brand:'Meine Stunden',nav:{menu:'Menü',nav:'Navigation',day:'Tag',month:'Monat',settings:'Einstellungen',export:'Export',pref:'Einstellungen',acct:'Konto'},day:{title:'Tägliche Eingabe',hint:'Start, Ende und Pause. Lokal automatisch gespeichert.',date:'Datum',start:'🟢 Einchecken',end:'🔴 Auschecken',break:'☕️ Pause (Min.)',k1:'Netto heute',k2:'Überstunden',k3:'Tages-Soll (Std.)',kWork:'Arbeitsstunden'},settings:{title:'Einstellungen',hint:'Standardwerte anpassen.',daily:'Tages-Soll (Std.)',brdef:'Standardpause (Min.)',apply:'Speichern'},month:{title:'Monatsübersicht',pick:'Monat wählen',m1:'Monatssumme',m2:'Erfasste Tage',m3:'Schnitt/Tag',close:'Schließen',refresh:'Aktualisieren',thead:['Datum','Start','Ende','Pause','Netto','ÜSt'],notesTitle:'Notizen',notesHead:['Datum','Status','Grund / Notiz','Aufgaben-Notiz']},export:{title:'Export',scope:'Bereich',format:'Format',optDay:'Tag',optMonth:'Monat',optBi:'Zwei Wochen',png:'Bild (PNG)',json:'JSON',cancel:'Abbrechen',do:'Exportieren',lang:'Exportsprache',bwStart:'Zwei-Wochen Start'},ui:{dark:'Dunkelmodus'},status:{label:'Tagesstatus',vals:{work:'Arbeit',vacation:'Urlaub',sick:'Krank',absent:'Abwesend'},reason:'Grund / Notiz',task:'Aufgaben-Notiz'},confirm:{title:'Änderungen speichern?',body:'Sie haben Änderungen vorgenommen. Möchten Sie diese speichern?',yes:'Ja',no:'Nein'}}
 };
 
 const LS_LANG='saaati_lang';
@@ -497,41 +460,26 @@ const dayReason=document.getElementById('dayReason');
 const taskNote=document.getElementById('taskNote');
 const reasonWrap=document.getElementById('reasonWrap');
 
-/* Balance (top kpi + bottom bar) */
-const k1=document.getElementById('k1');
-const k2=document.getElementById('k2');
-const k3=document.getElementById('k3');
-const kBalance=document.getElementById('kBalance');
 const dayName=document.getElementById('dayName');
 const stDaily=document.getElementById('stDaily');
 const stBreak=document.getElementById('stBreak');
 const dNet=document.getElementById('dNet');
 const dOT=document.getElementById('dOT');
 const dBase=document.getElementById('dBase');
-
-const balanceText=document.getElementById('balanceText');
-const balanceBadge=document.getElementById('balanceBadge');
-const balScopeBtn=document.getElementById('balScopeBtn');
+const kWorkTitle=document.getElementById('kWorkTitle');
+const dWorkHours=document.getElementById('dWorkHours');
 
 const langRow=document.getElementById('langRow');
 const darkToggle=document.getElementById('darkToggle');
 
 const toast = document.getElementById('toast');
 
-/* Confirm Save Modal refs */
-const csModal = document.getElementById('confirmSaveModal');
-const csTitle = document.getElementById('csTitle');
-const csBody  = document.getElementById('csBody');
-const csOk    = document.getElementById('csOk');
-const csCancel= document.getElementById('csCancel');
-
-/* ====== Utils ====== */
+/* ===== Utils ===== */
 function h2m(h){if(!h)return 0; const [H,M]=h.split(':').map(Number); return H*60+(M||0);}
 function m2h(m){m=Math.max(0,Math.floor(m)); const hh=Math.floor(m/60), mm=m%60; return `${hh}:${String(mm).padStart(2,'0')}`;}
-function signed(m){const s=Math.sign(m); const abs=Math.abs(m); const t=`${Math.floor(abs/60)}:${String(abs%60).padStart(2,'0')}`; return (s>=0?`+${t}`:`-${t}`);}
 function showToast(msg){ toast.textContent = msg; toast.classList.add('show'); setTimeout(()=> toast.classList.remove('show'), 1200); }
 
-/* ====== i18n ====== */
+/* ===== i18n ===== */
 function setActiveLangChip(lang){
   [...langRow.querySelectorAll('.lang-chip')].forEach(ch=>{
     ch.dataset.active = (ch.dataset.lang===lang) ? 'true' : 'false';
@@ -549,14 +497,15 @@ function setLang(lang){
   lblTheme.textContent=L.ui.dark;
 
   titleDay.textContent=L.day.title; hintDay.textContent=L.day.hint; lblDate.textContent=L.day.date; lblStart.textContent=L.day.start; lblEnd.textContent=L.day.end; lblBreak.textContent=L.day.break;
-  k1.textContent=L.day.k1; k2.textContent=L.day.k2; k3.textContent=L.day.k3;
-  document.getElementById('k4').textContent = L.ui.balance;
-  balanceText.textContent=L.ui.balance;
+  document.getElementById('k1').textContent=L.day.k1;
+  kWorkTitle.textContent=L.day.kWork;
+  document.getElementById('k2').textContent=L.day.k2;
+  document.getElementById('k3').textContent=L.day.k3;
 
   // status labels
-  document.getElementById('lblStatus')?.remove(); // ensure not duplicated
-  // add labels:
-  const lblStatusEl = document.createElement('label'); lblStatusEl.id='lblStatus'; lblStatusEl.textContent=L.status.label; dayStatus.parentElement.prepend(lblStatusEl);
+  let lblStatusEl = document.getElementById('lblStatus');
+  if(!lblStatusEl){ lblStatusEl = document.createElement('label'); lblStatusEl.id='lblStatus'; dayStatus.parentElement.prepend(lblStatusEl); }
+  lblStatusEl.textContent=L.status.label;
   reasonWrap.querySelector('label').textContent=L.status.reason;
   document.getElementById('lblTaskNote').textContent=L.status.task;
 
@@ -582,14 +531,29 @@ function setLang(lang){
   if(monthArea.dataset.built==='1'){buildMonthTableHead(lang);}
 }
 
-/* ====== Settings / Compute ====== */
+/* ===== Settings / Compute ===== */
 function loadSettings(){const s=JSON.parse(localStorage.getItem('settings')||'{}'); stDaily.value=s.daily??8; stBreak.value=s.break??30; dBase.textContent=String(stDaily.value);}
-function saveSettings(){const s={daily:parseFloat(stDaily.value||8),break:parseInt(stBreak.value||30,10)}; localStorage.setItem('settings',JSON.stringify(s)); dBase.textContent=String(s.daily); showToast('Saved ✅'); updateBalanceBar();}
+function saveSettings(){const s={daily:parseFloat(stDaily.value||8),break:parseInt(stBreak.value||30,10)}; localStorage.setItem('settings',JSON.stringify(s)); dBase.textContent=String(s.daily); showToast('Saved ✅');}
 
 function updateDayName(){const lang=currentLang; if(!dayDate.value){try{dayDate.valueAsDate=new Date();}catch{dayDate.value=new Date().toISOString().slice(0,10);} } try{const fmt=new Intl.DateTimeFormat(lang==='ar'?'ar-EG':lang==='de'?'de-DE':'en-GB',{weekday:'long'}); dayName.textContent=fmt.format(new Date(dayDate.value));}catch{dayName.textContent='—';}}
-function compute(){const base=Math.round(parseFloat(stDaily.value||8)*60); const s=dayStart.value,e=dayEnd.value,br=Math.max(0, parseInt(dayBreak.value||0,10) || 0); if(!s||!e){dNet.textContent='0:00'; dOT.textContent='0:00'; return;} let sm=h2m(s), em=h2m(e); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-br); const ot=Math.max(0,net-base); dNet.textContent=m2h(net); dOT.textContent=m2h(ot); dBase.textContent=String(stDaily.value||8);}
+function compute(){
+  const base=Math.round(parseFloat(stDaily.value||8)*60);
+  const s=dayStart.value,e=dayEnd.value,br=Math.max(0, parseInt(dayBreak.value||0,10) || 0);
+  if(!s||!e){
+    dNet.textContent='0:00'; dOT.textContent='0:00'; dWorkHours.textContent='0:00';
+    return;
+  }
+  let sm=h2m(s), em=h2m(e); if(em<sm) em+=1440;
+  const net=Math.max(0,(em-sm)-br);
+  const ot=Math.max(0,net-base);
+  dNet.textContent=m2h(net);
+  dOT.textContent=m2h(ot);
+  dBase.textContent=String(stDaily.value||8);
+  // Work Hours card (same net but مخصص بالاسم)
+  dWorkHours.textContent=m2h(net);
+}
 
-/* ====== Save/Load + Confirm flow ====== */
+/* ===== Save/Load + Confirm ===== */
 function captureForm(){
   return {
     date:dayDate.value,
@@ -612,48 +576,35 @@ function fillForm(p){
   compute();
 }
 
-let lastSaved = null;     // snapshot of last saved data for the selected day
-let confirmOpen = false;  // prevent stacking modals
+let lastSaved = null;
+let confirmOpen = false;
 let pendingChange = false;
 
-// open confirm modal with current i18n
-function openConfirm(){
-  if(confirmOpen) return;
-  confirmOpen=true;
-  csModal.classList.add('open');
-  csModal.setAttribute('aria-hidden','false');
-}
-function closeConfirm(){
-  confirmOpen=false;
-  csModal.classList.remove('open');
-  csModal.setAttribute('aria-hidden','true');
-}
+const csModal = document.getElementById('confirmSaveModal');
+const csTitle = document.getElementById('csTitle');
+const csBody  = document.getElementById('csBody');
+const csOk    = document.getElementById('csOk');
+const csCancel= document.getElementById('csCancel');
+
+function openConfirm(){ if(confirmOpen) return; confirmOpen=true; csModal.classList.add('open'); csModal.setAttribute('aria-hidden','false'); }
+function closeConfirm(){ confirmOpen=false; csModal.classList.remove('open'); csModal.setAttribute('aria-hidden','true'); }
 
 function saveDayLocal(){
   try{
     const p=captureForm();
     localStorage.setItem('day-'+p.date,JSON.stringify(p));
-    lastSaved = JSON.parse(JSON.stringify(p)); // deep copy
+    lastSaved = JSON.parse(JSON.stringify(p));
     showToast((currentLang==='ar'?'تم الحفظ ✅': currentLang==='de'?'Gespeichert ✅':'Saved ✅'));
-    updateBalanceBar();
-  }catch(e){
-    alert('Save error: '+e?.message);
-  }
+  }catch(e){ alert('Save error: '+e?.message); }
 }
-
 function loadDay(){
   const raw=localStorage.getItem('day-'+dayDate.value);
-  if(raw){
-    try{ lastSaved = JSON.parse(raw); fillForm(lastSaved); }
-    catch{ lastSaved = captureForm(); }
-  }else{
-    lastSaved = {date:dayDate.value,start:'',end:'',break:parseInt(stBreak.value||30,10),status:'work',reason:'',taskNote:''};
-    fillForm(lastSaved);
-  }
+  if(raw){ try{ lastSaved = JSON.parse(raw); fillForm(lastSaved); } catch{ lastSaved = captureForm(); } }
+  else{ lastSaved = {date:dayDate.value,start:'',end:'',break:parseInt(stBreak.value||30,10),status:'work',reason:'',taskNote:''}; fillForm(lastSaved); }
   pendingChange=false;
 }
 
-/* ====== Month + Notes (same as قبل) ====== */
+/* ===== Month / Notes ===== */
 function buildMonthTableHead(lang){const L=I18N[lang]; const thead=monthArea.querySelector('thead'); if(thead){thead.innerHTML=`<tr>${L.month.thead.map(h=>`<th>${h}</th>`).join('')}</tr>`;}}
 function buildNotesTable(lang, annotations){
   const L=I18N[lang];
@@ -709,10 +660,9 @@ function refreshMonthSummary(){
   monthArea.dataset.built='1'; buildMonthTableHead(currentLang);
   mTotal.textContent=m2h(total); mDays.textContent=String(daysCount); mAvg.textContent=daysCount?m2h(Math.round(total/daysCount)):'0:00';
   buildNotesTable(currentLang, annotations);
-  updateBalanceBar();
 }
 
-/* ====== Export (unchanged) ====== */
+/* ===== Export ===== */
 async function nodeToPNGAndDownload(node,filename){if(typeof html2canvas==='undefined'){alert('Image export unavailable.');return;} document.body.appendChild(node); const canvas=await html2canvas(node,{scale:2,backgroundColor:'#ffffff'}); const dataURL=canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=dataURL; a.download=filename.endsWith('.png')?filename:`${filename}.png`; a.click(); node.remove();}
 function tsNow(){ const d=new Date(), p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
 function periodLabelFromDates(start,end){const p=n=>String(n).padStart(2,'0'); return `${start.getFullYear()}-${p(start.getMonth()+1)}-${p(start.getDate())}_to_${end.getFullYear()}-${p(end.getMonth()+1)}-${p(end.getDate())}`}
@@ -815,61 +765,7 @@ function exportRowsJSON(scopeLabel, periodLabel, rows, lang, annotations){
   const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`${scopeLabel}-${periodLabel}.json`; a.click(); URL.revokeObjectURL(url);
 }
 
-/* ====== Balance ====== */
-let balanceScope = localStorage.getItem('balance_scope') || 'all';
-function computeBalanceMinutes(scope='all'){
-  const basePerDay = Math.round(parseFloat(stDaily.value||8)*60);
-  let bal = 0;
-  if(scope === 'month'){
-    const month = monthPick.value || dayDate.value.slice(0,7);
-    const [y,mo]=month.split('-').map(Number);
-    const first=new Date(y,mo-1,1), last=new Date(y,mo,0);
-    for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){
-      const key='day-'+d.toISOString().slice(0,10);
-      const raw=localStorage.getItem(key); if(!raw) continue;
-      try{
-        const p=JSON.parse(raw); if(!(p.start&&p.end)) continue;
-        let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440;
-        const net=Math.max(0,(em-sm)-parseInt(p.break||0,10));
-        bal += (net - basePerDay);
-      }catch{}
-    }
-    return bal;
-  }
-  for(let i=0;i<localStorage.length;i++){
-    const key = localStorage.key(i);
-    if(!key||!key.startsWith('day-')) continue;
-    try{
-      const p = JSON.parse(localStorage.getItem(key));
-      if(!(p && p.start && p.end)) continue;
-      let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440;
-      const net=Math.max(0,(em-sm)-parseInt(p.break||0,10));
-      bal += (net - basePerDay);
-    }catch{}
-  }
-  return bal;
-}
-function updateBalanceBar(){
-  const mins = computeBalanceMinutes(balanceScope);
-  const txt = signed(mins);
-  balanceBadge.textContent = txt;
-  balanceBadge.classList.toggle('ok', mins>=0);
-  balanceBadge.classList.toggle('bad', mins<0);
-  balScopeBtn.textContent = (balanceScope==='all' ? 'All' : 'Month');
-
-  // update KPI balance
-  kBalance.textContent = txt;
-  kBalance.classList.toggle('val-pos', mins>=0);
-  kBalance.classList.toggle('val-neg', mins<0);
-}
-balScopeBtn.addEventListener('click', ()=>{
-  balanceScope = (balanceScope==='all'?'month':'all');
-  localStorage.setItem('balance_scope', balanceScope);
-  updateBalanceBar();
-});
-monthPick?.addEventListener('change', ()=>{ if(balanceScope==='month') updateBalanceBar(); });
-
-/* ====== Auth ====== */
+/* ===== Auth ===== */
 authBtn.onclick = () => {
   if (auth.currentUser == null) window.location.href = 'login.html';
   else signOut(auth).catch(()=>{});
@@ -885,14 +781,14 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-/* ====== UI/Init/Events ====== */
+/* ===== UI / Init ===== */
 function showCard(card){[dayCard,settingsCard].forEach(el=>el.style.display='none'); card.style.display='block';}
 function openExport(){exportModal.classList.add('open'); exportModal.setAttribute('aria-hidden','false');}
 
 function initApp(){
   if(!localStorage.getItem(LS_LANG)){ localStorage.setItem(LS_LANG,'en'); currentLang='en'; }
 
-  // Drawer open/close
+  // Drawer
   menuToggle.onclick=()=>{
     const willOpen=!menuDrawer.classList.contains('open');
     menuDrawer.classList.toggle('open',willOpen);
@@ -931,11 +827,10 @@ function initApp(){
   };
   expScope.addEventListener('change', ()=>{ biweekWrap.style.display = (expScope.value==='biweek') ? 'block' : 'none'; });
 
-  // Inputs: open confirm on first change
+  // Inputs → confirm save
   function onUserChange(){
     compute();
-    pendingChange = true;
-    openConfirm();
+    if(!confirmOpen){ openConfirm(); }
   }
   [dayStart,dayEnd,dayBreak,dayReason,taskNote].forEach(el=>{
     el.addEventListener('input', onUserChange);
@@ -945,7 +840,7 @@ function initApp(){
     onUserChange();
   });
 
-  // Date change = load snapshot (no confirm here)
+  // Date change → load snapshot
   dayDate.addEventListener('change',()=>{ updateDayName(); loadDay(); });
 
   // Settings
@@ -959,57 +854,15 @@ function initApp(){
   // Confirm modal actions
   csOk.addEventListener('click', ()=>{
     saveDayLocal();
-    pendingChange=false;
     closeConfirm();
   });
   csCancel.addEventListener('click', ()=>{
-    // revert form to last saved snapshot
     if(lastSaved) fillForm(lastSaved);
-    pendingChange=false;
     closeConfirm();
   });
-  // prevent closing by clicking backdrop (forced decision)
   csModal.addEventListener('click', (e)=>{
     const dlg = e.target.closest('.dialog');
-    if(!dlg) e.stopPropagation(); // do nothing; keep modal open
-  });
-
-  // Export do
-  doExport.addEventListener('click', ()=>{
-    const langSel = expLang.value;
-    const L = I18N[langSel] || I18N.en;
-    const scope = expScope.value;
-    const fmt   = expFormat.value;
-
-    let periodLabel = '';
-    const basePerDay = Math.round(parseFloat(stDaily.value||8)*60);
-
-    if(scope==='day'){
-      periodLabel = dayDate.value;
-      if(fmt==='png'){ exportDayPNGWithLang(L); }
-      else{ exportDayJSONWithLang(langSel); }
-      exportModal.classList.remove('open'); return;
-    }
-    if(scope==='month'){
-      const month = monthPick.value || dayDate.value.slice(0,7);
-      const [y,mo]=month.split('-').map(Number);
-      const first=new Date(y,mo-1,1), last=new Date(y,mo,0);
-      const {rows,annotations} = buildDataForRange(first, last, basePerDay);
-      periodLabel = month;
-      if(fmt==='png'){ exportPeriodPNG(L, L.month.title, periodLabel, rows, annotations); }
-      else{ exportRowsJSON('month', periodLabel, rows, langSel, annotations); }
-      exportModal.classList.remove('open'); return;
-    }
-    if(scope==='biweek'){
-      const start = bwStart.value ? new Date(bwStart.value) : new Date();
-      const end   = new Date(start); end.setDate(start.getDate()+13);
-      const {rows,annotations} = buildDataForRange(start, end, basePerDay);
-      periodLabel = periodLabelFromDates(start,end);
-      const titleText = (L.export.optBi || 'Two Weeks');
-      if(fmt==='png'){ exportPeriodPNG(L, titleText, periodLabel, rows, annotations); }
-      else{ exportRowsJSON('biweek', periodLabel, rows, langSel, annotations); }
-      exportModal.classList.remove('open'); return;
-    }
+    if(!dlg) e.stopPropagation();
   });
 
   // Init
@@ -1018,12 +871,10 @@ function initApp(){
   loadSettings();
   loadDay();
   compute();
-  updateBalanceBar();
 
-  // Keep dark toggle UI
   darkToggle.checked = document.body.classList.contains('dark');
 }
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initApp);}else{initApp();}
 </script>
 </body>
-  </html>
+</html>
