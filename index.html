@@ -99,6 +99,14 @@ input[type="date"], input[type="time"]{direction:ltr;text-align:center}
 .kcard h3{margin:0;color:var(--muted);font-size:13px}
 .kcard .val{font-size:20px;font-weight:800;margin-top:4px}
 
+/* Day annotations (status + notes) */
+.annot-grid{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-top:12px}
+@media (max-width:720px){.annot-grid{grid-template-columns:1fr}}
+.form-field label{display:block;color:var(--muted);font-size:13px;margin:0 0 6px}
+.select, .textarea{width:100%;border:1px solid var(--line);border-radius:12px;background:#fff;color:#0f172a;padding:10px}
+.textarea{min-height:70px;resize:vertical}
+.dark .select, .dark .textarea{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
+
 /* Modals */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:80}
 .modal.open{display:flex}
@@ -112,6 +120,12 @@ tbody tr{background:#fff;border:1px solid var(--line)}
 .dark tbody tr{background:#0a1222;border-color:#1f2b40}
 tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
 tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
+
+/* Notes table inside month modal */
+.note-table th{font-size:12px;color:#334155}
+.note-table td, .note-table th{padding:8px 10px;text-align:start}
+.badge-note{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:#f8fafc;font-weight:700;font-size:12px}
+.dark .badge-note{background:#0e1528;border-color:#1f2b40;color:#e5e7eb}
 
 /* Bottom balance bar */
 .bottom-bar{
@@ -248,6 +262,27 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
       </div>
     </div>
 
+    <!-- Day annotations -->
+    <div class="annot-grid">
+      <div class="form-field">
+        <label id="lblStatus">Day Status</label>
+        <select id="dayStatus" class="select">
+          <option value="work" selected>Work</option>
+          <option value="vacation">Vacation</option>
+          <option value="sick">Sick</option>
+          <option value="absent">Absent (Other)</option>
+        </select>
+      </div>
+      <div class="form-field" id="reasonWrap" style="display:none">
+        <label id="lblReason">Reason / Note</label>
+        <input id="dayReason" class="select" placeholder="Reason for absence..." />
+      </div>
+      <div class="form-field" style="grid-column:1 / -1">
+        <label id="lblTaskNote">Task Note (what you did)</label>
+        <textarea id="taskNote" class="textarea" placeholder="Brief note about tasks completed today..."></textarea>
+      </div>
+    </div>
+
     <div class="kpis">
       <div class="kcard"><h3 id="k1">Net Today</h3><div class="val" id="dNet">0:00</div></div>
       <div class="kcard"><h3 id="k2">Overtime</h3><div class="val" id="dOT">0:00</div></div>
@@ -283,6 +318,10 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
       <button id="refreshMonth" class="btn">Refresh</button>
     </div>
     <div id="monthArea" style="margin-top:12px"></div>
+
+    <!-- Notes section -->
+    <div id="notesArea" style="margin-top:16px"></div>
+
     <div class="kpis">
       <div class="kcard"><h3 id="mk1">Month Total</h3><div class="val" id="mTotal">0:00</div></div>
       <div class="kcard"><h3 id="mk2">Logged Days</h3><div class="val" id="mDays">0</div></div>
@@ -292,12 +331,11 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   </div>
 </div>
 
-<!-- Export modal (new options) -->
+<!-- Export modal (unchanged from آخر نسخة ميزات) -->
 <div id="exportModal" class="modal" aria-hidden="true">
   <div class="dialog" style="max-width:620px">
     <h2 id="titleExport">Export</h2>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <!-- Scope -->
       <div>
         <label id="lblScope">Scope</label>
         <select id="expScope" class="input" style="height:40px">
@@ -306,7 +344,6 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
           <option value="biweek">Two Weeks</option>
         </select>
       </div>
-      <!-- Format -->
       <div>
         <label id="lblFormat">Format</label>
         <select id="expFormat" class="input" style="height:40px">
@@ -314,7 +351,6 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
           <option value="json">JSON</option>
         </select>
       </div>
-      <!-- Export language -->
       <div>
         <label id="lblLang">Export Language</label>
         <select id="expLang" class="input" style="height:40px">
@@ -323,7 +359,6 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
           <option value="de">Deutsch</option>
         </select>
       </div>
-      <!-- Bi-week start date (shown only when scope=biweek) -->
       <div id="biweekWrap" style="display:none">
         <label id="lblBwStart">Two Weeks Start</label>
         <input id="bwStart" type="date" class="input" />
@@ -373,9 +408,9 @@ await setPersistence(auth, browserLocalPersistence);
 
 /* ================= I18N ================= */
 const I18N = {
-  ar:{dir:'rtl',brand:'ساعتي',nav:{menu:'القائمة',nav:'التنقل',day:'اليوم',month:'الشهري',settings:'الإعدادات',export:'تصدير',pref:'التفضيلات',acct:'الحساب'},day:{title:'الإدخال اليومي',hint:'أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.',date:'تاريخ',start:'🟢 دخول',end:'🔴 خروج',break:'☕️ استراحة (دقيقة)',k1:'صافي اليوم',k2:'إضافي اليوم',k3:'أساس اليوم (س)',k4:'حالة الحفظ',saved:'تم الحفظ تلقائيًا ✅'},settings:{title:'الإعدادات',hint:'اضبط القيم الافتراضية.',daily:'أساس اليوم (ساعات)',brdef:'استراحة افتراضية (دقيقة)',apply:'حفظ'},month:{title:'ملخص شهري',pick:'اختر الشهر',m1:'مجموع الشهر',m2:'أيام مسجلة',m3:'معدل اليوم',close:'إغلاق',refresh:'تحديث',thead:['التاريخ','البداية','النهاية','استراحة','الصافي','إضافي']},export:{title:'تصدير',scope:'النطاق',format:'الصيغة',optDay:'اليوم',optMonth:'الشهر',optBi:'أسبوعين',png:'صورة (PNG)',json:'JSON',cancel:'إلغاء',do:'تصدير',lang:'لغة التصدير',bwStart:'بداية الأسبوعين'},ui:{dark:'الوضع الداكن',balance:'الرصيد'}},
-  en:{dir:'ltr',brand:'Saaati',nav:{menu:'Menu',nav:'Navigation',day:'Day',month:'Monthly',settings:'Settings',export:'Export',pref:'Preferences',acct:'Account'},day:{title:'Daily Entry',hint:'Enter start, end and break. Autosaved locally.',date:'Date',start:'🟢 Clock In',end:'🔴 Clock Out',break:'☕️ Break (min)',k1:'Net Today',k2:'Overtime',k3:'Daily Base (h)',k4:'Save Status',saved:'Auto-saved ✅'},settings:{title:'Settings',hint:'Adjust defaults.',daily:'Daily Base (hours)',brdef:'Default Break (min)',apply:'Save'},month:{title:'Monthly Summary',pick:'Pick month',m1:'Month Total',m2:'Logged Days',m3:'Avg/Day',close:'Close',refresh:'Refresh',thead:['Date','Start','End','Break','Net','OT']},export:{title:'Export',scope:'Scope',format:'Format',optDay:'Day',optMonth:'Month',optBi:'Two Weeks',png:'Image (PNG)',json:'JSON',cancel:'Cancel',do:'Export',lang:'Export Language',bwStart:'Two Weeks Start'},ui:{dark:'Dark mode',balance:'Balance'}},
-  de:{dir:'ltr',brand:'Meine Stunden',nav:{menu:'Menü',nav:'Navigation',day:'Tag',month:'Monat',settings:'Einstellungen',export:'Export',pref:'Einstellungen',acct:'Konto'},day:{title:'Tägliche Eingabe',hint:'Start, Ende und Pause. Lokal automatisch gespeichert.',date:'Datum',start:'🟢 Einchecken',end:'🔴 Auschecken',break:'☕️ Pause (Min.)',k1:'Netto heute',k2:'Überstunden',k3:'Tages-Soll (Std)',k4:'Speicherstatus',saved:'Automatisch gespeichert ✅'},settings:{title:'Einstellungen',hint:'Standardwerte anpassen.',daily:'Tages-Soll (Std.)',brdef:'Standardpause (Min.)',apply:'Speichern'},month:{title:'Monatsübersicht',pick:'Monat wählen',m1:'Monatssumme',m2:'Erfasste Tage',m3:'Schnitt/Tag',close:'Schließen',refresh:'Aktualisieren',thead:['Datum','Start','Ende','Pause','Netto','ÜSt']},export:{title:'Export',scope:'Bereich',format:'Format',optDay:'Tag',optMonth:'Monat',optBi:'Zwei Wochen',png:'Bild (PNG)',json:'JSON',cancel:'Abbrechen',do:'Exportieren',lang:'Exportsprache',bwStart:'Zwei-Wochen Start'},ui:{dark:'Dunkelmodus',balance:'Saldo'}}
+  ar:{dir:'rtl',brand:'ساعتي',nav:{menu:'القائمة',nav:'التنقل',day:'اليوم',month:'الشهري',settings:'الإعدادات',export:'تصدير',pref:'التفضيلات',acct:'الحساب'},day:{title:'الإدخال اليومي',hint:'أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.',date:'تاريخ',start:'🟢 دخول',end:'🔴 خروج',break:'☕️ استراحة (دقيقة)',k1:'صافي اليوم',k2:'إضافي اليوم',k3:'أساس اليوم (س)',k4:'حالة الحفظ',saved:'تم الحفظ تلقائيًا ✅',status:'حالة اليوم',statusVals:{work:'عمل',vacation:'إجازة',sick:'مرض',absent:'غياب'},reason:'سبب / ملاحظة',task:'ملاحظة مهمة'},settings:{title:'الإعدادات',hint:'اضبط القيم الافتراضية.',daily:'أساس اليوم (ساعات)',brdef:'استراحة افتراضية (دقيقة)',apply:'حفظ'},month:{title:'ملخص شهري',pick:'اختر الشهر',m1:'مجموع الشهر',m2:'أيام مسجلة',m3:'معدل اليوم',close:'إغلاق',refresh:'تحديث',thead:['التاريخ','البداية','النهاية','استراحة','الصافي','إضافي'],notesTitle:'ملاحظات',notesHead:['التاريخ','الحالة','سبب / ملاحظة','ملاحظة المهمة']},export:{title:'تصدير',scope:'النطاق',format:'الصيغة',optDay:'اليوم',optMonth:'الشهر',optBi:'أسبوعين',png:'صورة (PNG)',json:'JSON',cancel:'إلغاء',do:'تصدير',lang:'لغة التصدير',bwStart:'بداية الأسبوعين'} ,ui:{dark:'الوضع الداكن',balance:'الرصيد'}},
+  en:{dir:'ltr',brand:'Saaati',nav:{menu:'Menu',nav:'Navigation',day:'Day',month:'Monthly',settings:'Settings',export:'Export',pref:'Preferences',acct:'Account'},day:{title:'Daily Entry',hint:'Enter start, end and break. Autosaved locally.',date:'Date',start:'🟢 Clock In',end:'🔴 Clock Out',break:'☕️ Break (min)',k1:'Net Today',k2:'Overtime',k3:'Daily Base (h)',k4:'Save Status',saved:'Auto-saved ✅',status:'Day Status',statusVals:{work:'Work',vacation:'Vacation',sick:'Sick',absent:'Absent (Other)'},reason:'Reason / Note',task:'Task Note'},settings:{title:'Settings',hint:'Adjust defaults.',daily:'Daily Base (hours)',brdef:'Default Break (min)',apply:'Save'},month:{title:'Monthly Summary',pick:'Pick month',m1:'Month Total',m2:'Logged Days',m3:'Avg/Day',close:'Close',refresh:'Refresh',thead:['Date','Start','End','Break','Net','OT'],notesTitle:'Notes',notesHead:['Date','Status','Reason / Note','Task Note']},export:{title:'Export',scope:'Scope',format:'Format',optDay:'Day',optMonth:'Month',optBi:'Two Weeks',png:'Image (PNG)',json:'JSON',cancel:'Cancel',do:'Export',lang:'Export Language',bwStart:'Two Weeks Start'},ui:{dark:'Dark mode',balance:'Balance'}},
+  de:{dir:'ltr',brand:'Meine Stunden',nav:{menu:'Menü',nav:'Navigation',day:'Tag',month:'Monat',settings:'Einstellungen',export:'Export',pref:'Einstellungen',acct:'Konto'},day:{title:'Tägliche Eingabe',hint:'Start, Ende und Pause. Lokal automatisch gespeichert.',date:'Datum',start:'🟢 Einchecken',end:'🔴 Auschecken',break:'☕️ Pause (Min.)',k1:'Netto heute',k2:'Überstunden',k3:'Tages-Soll (Std)',k4:'Speicherstatus',saved:'Automatisch gespeichert ✅',status:'Tagesstatus',statusVals:{work:'Arbeit',vacation:'Urlaub',sick:'Krank',absent:'Abwesend'},reason:'Grund / Notiz',task:'Aufgaben-Notiz'},settings:{title:'Einstellungen',hint:'Standardwerte anpassen.',daily:'Tages-Soll (Std.)',brdef:'Standardpause (Min.)',apply:'Speichern'},month:{title:'Monatsübersicht',pick:'Monat wählen',m1:'Monatssumme',m2:'Erfasste Tage',m3:'Schnitt/Tag',close:'Schließen',refresh:'Aktualisieren',thead:['Datum','Start','Ende','Pause','Netto','ÜSt'],notesTitle:'Notizen',notesHead:['Datum','Status','Grund / Notiz','Aufgaben-Notiz']},export:{title:'Export',scope:'Bereich',format:'Format',optDay:'Tag',optMonth:'Monat',optBi:'Zwei Wochen',png:'Bild (PNG)',json:'JSON',cancel:'Abbrechen',do:'Exportieren',lang:'Exportsprache',bwStart:'Zwei-Wochen Start'},ui:{dark:'Dunkelmodus',balance:'Saldo'}}
 };
 
 /* Defaults */
@@ -413,6 +448,15 @@ const k2=document.getElementById('k2');
 const k3=document.getElementById('k3');
 const k4=document.getElementById('k4');
 
+/* New refs for annotations */
+const lblStatus=document.getElementById('lblStatus');
+const dayStatus=document.getElementById('dayStatus');
+const reasonWrap=document.getElementById('reasonWrap');
+const lblReason=document.getElementById('lblReason');
+const dayReason=document.getElementById('dayReason');
+const lblTaskNote=document.getElementById('lblTaskNote');
+const taskNote=document.getElementById('taskNote');
+
 const titleSettings=document.getElementById('titleSettings');
 const hintSettings=document.getElementById('hintSettings');
 const lblDaily=document.getElementById('lblDaily');
@@ -426,6 +470,7 @@ const closeMonth=document.getElementById('closeMonth');
 const monthModal=document.getElementById('monthModal');
 const monthPick=document.getElementById('monthPick');
 const monthArea=document.getElementById('monthArea');
+const notesArea=document.getElementById('notesArea');
 const mTotal=document.getElementById('mTotal');
 const mDays=document.getElementById('mDays');
 const mAvg=document.getElementById('mAvg');
@@ -478,66 +523,191 @@ function showToast(msg){ toast.textContent = msg; toast.classList.add('show'); s
 
 /* Settings */
 function loadSettings(){const s=JSON.parse(localStorage.getItem('settings')||'{}'); stDaily.value=s.daily??8; stBreak.value=s.break??30; dBase.textContent=String(stDaily.value);}
-function saveSettings(){const s={daily:parseFloat(stDaily.value||8),break:parseInt(stBreak.value||0,10)}; localStorage.setItem('settings',JSON.stringify(s)); dBase.textContent=String(s.daily); notifySaved(); updateBalanceBar();}
+function saveSettings(){const s={daily:parseFloat(stDaily.value||8),break:parseInt(stBreak.value||30,10)}; localStorage.setItem('settings',JSON.stringify(s)); dBase.textContent=String(s.daily); notifySaved(); updateBalanceBar();}
 
 /* Day */
 function updateDayName(){const lang=currentLang; if(!dayDate.value){try{dayDate.valueAsDate=new Date();}catch{dayDate.value=new Date().toISOString().slice(0,10);} } try{const fmt=new Intl.DateTimeFormat(lang==='ar'?'ar-EG':lang==='de'?'de-DE':'en-GB',{weekday:'long'}); dayName.textContent=fmt.format(new Date(dayDate.value));}catch{dayName.textContent='—';}}
 function compute(){const base=Math.round(parseFloat(stDaily.value||8)*60); const s=dayStart.value,e=dayEnd.value,br=Math.max(0, parseInt(dayBreak.value||0,10) || 0); if(!s||!e){dNet.textContent='0:00'; dOT.textContent='0:00'; return;} let sm=h2m(s), em=h2m(e); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-br); const ot=Math.max(0,net-base); dNet.textContent=m2h(net); dOT.textContent=m2h(ot); dBase.textContent=String(stDaily.value||8);}
 function notifySaved(){const L=I18N[currentLang]; showToast(L.day.saved || 'Saved ✅');}
-function saveDayLocal(){const p={date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}; localStorage.setItem('day-'+p.date,JSON.stringify(p)); notifySaved(); updateBalanceBar(); }
-function loadDay(){const raw=localStorage.getItem('day-'+dayDate.value); if(raw){try{const p=JSON.parse(raw); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=p.break??(stBreak.value||30);}catch{dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30;}} else { dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30; } compute();}
+function saveDayLocal(){
+  const p={
+    date:dayDate.value,
+    start:dayStart.value,
+    end:dayEnd.value,
+    break:parseInt(dayBreak.value||0,10),
+    status:dayStatus.value,
+    reason:dayReason.value||'',
+    taskNote:taskNote.value||''
+  };
+  localStorage.setItem('day-'+p.date,JSON.stringify(p));
+  notifySaved(); updateBalanceBar();
+}
+function loadDay(){
+  const raw=localStorage.getItem('day-'+dayDate.value);
+  if(raw){
+    try{
+      const p=JSON.parse(raw);
+      dayStart.value=p.start||'';
+      dayEnd.value=p.end||'';
+      dayBreak.value=p.break??(stBreak.value||30);
+      dayStatus.value=p.status||'work';
+      dayReason.value=p.reason||'';
+      taskNote.value=p.taskNote||'';
+    }catch{
+      dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30;
+      dayStatus.value='work'; dayReason.value=''; taskNote.value='';
+    }
+  }else{
+    dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30;
+    dayStatus.value='work'; dayReason.value=''; taskNote.value='';
+  }
+  // toggle reason field
+  reasonWrap.style.display = (dayStatus.value==='work') ? 'none' : 'block';
+  compute();
+}
 
-/* Month table */
+/* Month table + Notes */
 function buildMonthTableHead(lang){const L=I18N[lang]; const thead=monthArea.querySelector('thead'); if(thead){thead.innerHTML=`<tr>${L.month.thead.map(h=>`<th>${h}</th>`).join('')}</tr>`;}}
+function buildNotesTable(lang, annotations){
+  const L=I18N[lang];
+  if(!annotations.length){ notesArea.innerHTML=''; return; }
+  const head = L.month.notesHead;
+  let html = `<h3 style="margin:10px 0">${L.month.notesTitle}</h3>
+    <table class="table note-table"><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+  annotations.forEach(a=>{
+    html += `<tr><td>${a.date}</td><td><span class="badge-note">${a.statusLabel}</span></td><td>${a.reason||'-'}</td><td>${a.taskNote||'-'}</td></tr>`;
+  });
+  html += `</tbody></table>`;
+  notesArea.innerHTML = html;
+}
+
 function openMonth(){if(!monthPick.value){monthPick.value=dayDate.value.slice(0,7);} monthModal.classList.add('open'); monthModal.setAttribute('aria-hidden','false'); refreshMonthSummary();}
-function refreshMonthSummary(){const month=monthPick.value||dayDate.value.slice(0,7); const [y,mo]=month.split('-').map(Number); const first=new Date(y,mo-1,1), last=new Date(y,mo,0); const baseDay=Math.round(parseFloat(stDaily.value||8)*60); const rows=[]; let total=0, daysCount=0; for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){const key='day-'+d.toISOString().slice(0,10); const raw=localStorage.getItem(key); if(!raw) continue; try{const p=JSON.parse(raw); if(p.start&&p.end){let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-parseInt(p.break||0,10)); const ot=Math.max(0,net-baseDay); rows.push([key.slice(4),p.start,p.end,p.break||0,m2h(net),m2h(ot)]); total+=net; daysCount++; }}catch{}} rows.sort((a,b)=>a[0]<b[0]?-1:1); const lang=currentLang; const L=I18N[lang]; let html=`<table class="table"><thead></thead><tbody>`; rows.forEach(r=> html+=`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`); html+='</tbody></table>'; monthArea.innerHTML=html; monthArea.dataset.built='1'; buildMonthTableHead(lang); mTotal.textContent=m2h(total); mDays.textContent=String(daysCount); mAvg.textContent=daysCount?m2h(Math.round(total/daysCount)):'0:00'; updateBalanceBar();}
+function refreshMonthSummary(){
+  const month=monthPick.value||dayDate.value.slice(0,7);
+  const [y,mo]=month.split('-').map(Number);
+  const first=new Date(y,mo-1,1), last=new Date(y,mo,0);
+  const baseDay=Math.round(parseFloat(stDaily.value||8)*60);
+  const rows=[]; let total=0, daysCount=0;
+  const annotations=[];
+
+  // iterate days in month
+  for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){
+    const key='day-'+d.toISOString().slice(0,10);
+    const raw=localStorage.getItem(key); if(!raw) continue;
+    try{
+      const p=JSON.parse(raw);
+
+      // Add working rows (only if there are times) -> preserves old totals/avg
+      if(p.start&&p.end){
+        let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440;
+        const net=Math.max(0,(em-sm)-parseInt(p.break||0,10));
+        const ot=Math.max(0,net-baseDay);
+        rows.push([key.slice(4),p.start,p.end,p.break||0,m2h(net),m2h(ot)]);
+        total+=net; daysCount++;
+      }
+
+      // Collect annotations if non-work status or any task note
+      const nonWork = p.status && p.status!=='work';
+      const hasTask = p.taskNote && p.taskNote.trim().length>0;
+      if(nonWork || hasTask){
+        const lang=currentLang, L=I18N[lang];
+        const map=L.day.statusVals;
+        annotations.push({
+          date:key.slice(4),
+          status:p.status||'work',
+          statusLabel: (map && map[p.status||'work']) || (p.status||'work'),
+          reason:p.reason||'',
+          taskNote:p.taskNote||''
+        });
+      }
+    }catch{}
+  }
+
+  rows.sort((a,b)=>a[0]<b[0]?-1:1);
+  annotations.sort((a,b)=>a.date<b.date?-1:1);
+
+  // render main table
+  const lang=currentLang; const L=I18N[lang];
+  let html=`<table class="table"><thead></thead><tbody>`;
+  rows.forEach(r=> html+=`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`);
+  html+='</tbody></table>';
+  monthArea.innerHTML=html;
+  monthArea.dataset.built='1'; buildMonthTableHead(lang);
+
+  // KPIs (unchanged behavior)
+  mTotal.textContent=m2h(total); mDays.textContent=String(daysCount); mAvg.textContent=daysCount?m2h(Math.round(total/daysCount)):'0:00';
+
+  // render notes table
+  buildNotesTable(lang, annotations);
+
+  updateBalanceBar();
+}
 
 /* Export helpers */
 async function nodeToPNGAndDownload(node,filename){if(typeof html2canvas==='undefined'){alert('Image export unavailable.');return;} document.body.appendChild(node); const canvas=await html2canvas(node,{scale:2,backgroundColor:'#ffffff'}); const dataURL=canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=dataURL; a.download=filename.endsWith('.png')?filename:`${filename}.png`; a.click(); node.remove();}
 function tsNow(){ const d=new Date(), p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
+function periodLabelFromDates(start,end){const p=n=>String(n).padStart(2,'0'); return `${start.getFullYear()}-${p(start.getMonth()+1)}-${p(start.getDate())}_to_${end.getFullYear()}-${p(end.getMonth()+1)}-${p(end.getDate())}`}
 
-/* Build rows within a period [d0..d1] inclusive */
-function buildRowsForRange(d0, d1, basePerDay){
+/* Build rows + annotations within a period [d0..d1] inclusive */
+function buildDataForRange(d0, d1, basePerDay){
   const rows=[]; let total=0, daysCount=0;
+  const annotations=[];
   for(let d=new Date(d0); d<=d1; d.setDate(d.getDate()+1)){
     const key='day-'+d.toISOString().slice(0,10);
-    const raw=localStorage.getItem(key);
-    if(!raw) continue;
+    const raw=localStorage.getItem(key); if(!raw) continue;
     try{
       const p=JSON.parse(raw);
-      if(!(p.start&&p.end)) continue;
-      let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440;
-      const net=Math.max(0,(em-sm)-parseInt(p.break||0,10));
-      const ot=Math.max(0,net-basePerDay);
-      rows.push([key.slice(4),p.start,p.end,p.break||0,m2h(net),m2h(ot)]);
-      total+=net; daysCount++;
+      if(p.start&&p.end){
+        let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440;
+        const net=Math.max(0,(em-sm)-parseInt(p.break||0,10));
+        const ot=Math.max(0,net-basePerDay);
+        rows.push([key.slice(4),p.start,p.end,p.break||0,m2h(net),m2h(ot)]);
+        total+=net; daysCount++;
+      }
+      const nonWork = p.status && p.status!=='work';
+      const hasTask = p.taskNote && p.taskNote.trim().length>0;
+      if(nonWork || hasTask){
+        const lang=expLang.value, L=I18N[lang], map=L.day.statusVals;
+        annotations.push({
+          date:key.slice(4),
+          statusLabel: (map && map[p.status||'work']) || (p.status||'work'),
+          reason:p.reason||'',
+          taskNote:p.taskNote||''
+        });
+      }
     }catch{}
   }
   rows.sort((a,b)=>a[0]<b[0]?-1:1);
-  return {rows,total,daysCount};
+  annotations.sort((a,b)=>a.date<b.date?-1:1);
+  return {rows,total,daysCount,annotations};
 }
 
 /* Export (use chosen expLang) */
 function exportDayPNGWithLang(L){
   const node=document.createElement('div'); node.lang=expLang.value; node.dir=L.dir;
-  node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff;';
-  node.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+  node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff; width:760px;';
+  const map=L.day.statusVals;
+  const statusTxt=(map && map[dayStatus.value]) || dayStatus.value;
+  let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
       <h2 style="margin:0">${L.day.title}</h2><div>${tsNow()}</div>
     </div>
     <div style="margin:6px 0">${L.day.date}: <strong>${dayDate.value}</strong></div>
     <div style="margin:6px 0">${L.day.start.replace('🟢 ','')}: <strong>${dayStart.value||'-'}</strong>
       — ${L.day.end.replace('🔴 ','')}: <strong>${dayEnd.value||'-'}</strong>
-      — ${L.day.break.replace('☕️ ','')}: <strong>${dayBreak.value||0}</strong>
-    </div>
+      — ${L.day.break.replace('☕️ ','')}: <strong>${dayBreak.value||0}</strong></div>
     <div style="margin:6px 0">${L.day.k1}: <strong>${dNet.textContent}</strong>
       — ${L.day.k2}: <strong>${dOT.textContent}</strong>
-      — ${L.settings?.daily || 'Daily Base (hours)'}: <strong>${stDaily.value}</strong></div>`;
+      — ${L.settings?.daily || 'Daily Base (hours)'}: <strong>${stDaily.value}</strong></div>
+    <div style="margin:10px 0"><strong>${L.day.status}:</strong> ${statusTxt}</div>`;
+  if(dayStatus.value!=='work' && dayReason.value){ html+=`<div style="margin:6px 0"><strong>${L.day.reason}:</strong> ${dayReason.value}</div>`; }
+  if(taskNote.value){ html+=`<div style="margin:6px 0"><strong>${L.day.task}:</strong> ${taskNote.value}</div>`; }
+  node.innerHTML=html;
   nodeToPNGAndDownload(node,`day-${dayDate.value}.png`);
 }
 
-function exportPeriodPNG(L, title, periodLabel, rows){
+function exportPeriodPNG(L, title, periodLabel, rows, annotations){
   const node=document.createElement('div'); node.lang=expLang.value; node.dir=L.dir;
-  node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff; width:780px;';
+  node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff; width:900px;';
 
   let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
       <h2 style="margin:0">${title}</h2><div>${tsNow()}</div>
@@ -551,18 +721,35 @@ function exportPeriodPNG(L, title, periodLabel, rows){
       <td style="padding:8px 10px">${r[2]}</td><td style="padding:8px 10px">${r[3]}</td>
       <td style="padding:8px 10px">${r[4]}</td><td style="padding:8px 10px">${r[5]}</td></tr>`;});
   html+=`</tbody></table>`;
+
+  if(annotations.length){
+    const head=L.month.notesHead;
+    html+=`<div style="margin-top:12px"><h3 style="margin:8px 0">${L.month.notesTitle}</h3>
+      <table style="width:100%;border-collapse:separate;border-spacing:0 8px">
+        <thead><tr>${head.map(h=>`<th style="text-align:left;color:#475569;font-size:13px">${h}</th>`).join('')}</tr></thead><tbody>`;
+    annotations.forEach(a=>{
+      html+=`<tr style="background:#fff;border:1px solid #e2e8f0">
+        <td style="padding:8px 10px">${a.date}</td>
+        <td style="padding:8px 10px">${a.statusLabel}</td>
+        <td style="padding:8px 10px">${a.reason||'-'}</td>
+        <td style="padding:8px 10px">${a.taskNote||'-'}</td></tr>`;
+    });
+    html+=`</tbody></table></div>`;
+  }
+
   node.innerHTML=html;
   nodeToPNGAndDownload(node,`period-${periodLabel}.png`);
 }
 
 function exportDayJSONWithLang(lang){
-  const data={meta:{scope:'day',lang,date:dayDate.value,exportedAt:new Date().toISOString()},payload:{date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}};
+  const data={meta:{scope:'day',lang,date:dayDate.value,exportedAt:new Date().toISOString()},
+    payload:{date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10),status:dayStatus.value,reason:dayReason.value||'',taskNote:taskNote.value||''}};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`day-${dayDate.value}.json`; a.click(); URL.revokeObjectURL(url);
 }
 
-function exportRowsJSON(scopeLabel, periodLabel, rows, lang){
-  const data={meta:{scope:scopeLabel,period:periodLabel,lang,exportedAt:new Date().toISOString()},rows};
+function exportRowsJSON(scopeLabel, periodLabel, rows, lang, annotations){
+  const data={meta:{scope:scopeLabel,period:periodLabel,lang,exportedAt:new Date().toISOString()},rows,annotations};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`${scopeLabel}-${periodLabel}.json`; a.click(); URL.revokeObjectURL(url);
 }
@@ -588,6 +775,18 @@ function setLang(lang){
   lblTheme.textContent=L.ui.dark;
 
   titleDay.textContent=L.day.title; hintDay.textContent=L.day.hint; lblDate.textContent=L.day.date; lblStart.textContent=L.day.start; lblEnd.textContent=L.day.end; lblBreak.textContent=L.day.break; k1.textContent=L.day.k1; k2.textContent=L.day.k2; k3.textContent=L.day.k3; k4.textContent=L.day.k4;
+
+  // annotations labels
+  lblStatus.textContent=L.day.status;
+  // update options text
+  const optsMap = L.day.statusVals;
+  dayStatus.options[0].text = optsMap.work;
+  dayStatus.options[1].text = optsMap.vacation;
+  dayStatus.options[2].text = optsMap.sick;
+  dayStatus.options[3].text = optsMap.absent;
+  lblReason.textContent=L.day.reason;
+  lblTaskNote.textContent=L.day.task;
+
   titleSettings.textContent=L.settings.title; hintSettings.textContent=L.settings.hint; lblDaily.textContent=L.settings.daily; lblBreakDef.textContent=L.settings.brdef; applySettings.textContent=L.settings.apply;
   titleMonth.textContent=L.month.title; lblPickMonth.textContent=L.month.pick; document.getElementById('mk1').textContent=L.month.m1; document.getElementById('mk2').textContent=L.month.m2; document.getElementById('mk3').textContent=L.month.m3; refreshMonth.textContent=L.month.refresh; closeMonth.textContent=L.month.close;
 
@@ -628,7 +827,7 @@ function computeBalanceMinutes(scope='all'){
       const key='day-'+d.toISOString().slice(0,10);
       const raw=localStorage.getItem(key); if(!raw) continue;
       try{
-        const p=JSON.parse(raw); if(!(p.start&&p.end)) continue;
+        const p=JSON.parse(raw); if(!(p.start&&p.end)) continue; // unchanged
         let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440;
         const net=Math.max(0,(em-sm)-parseInt(p.break||0,10));
         bal += (net - basePerDay);
@@ -643,7 +842,7 @@ function computeBalanceMinutes(scope='all'){
     if(!key||!key.startsWith('day-')) continue;
     try{
       const p = JSON.parse(localStorage.getItem(key));
-      if(!(p && p.start && p.end)) continue;
+      if(!(p && p.start && p.end)) continue; // unchanged
       let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440;
       const net=Math.max(0,(em-sm)-parseInt(p.break||0,10));
       bal += (net - basePerDay);
@@ -717,12 +916,11 @@ function initApp(){
   mnuDay.onclick=()=>{showCard(dayCard); menuDrawer.classList.remove('open');};
   mnuSettings.onclick=()=>{loadSettings(); showCard(settingsCard); menuDrawer.classList.remove('open');};
   mnuMonth.onclick=()=>{openMonth(); menuDrawer.classList.remove('open');};
-  mnuExport.onclick=()=>{openExport(); // تعيين قيم افتراضية للتصدير
+  mnuExport.onclick=()=>{openExport();
     expLang.value = currentLang;
     expScope.value = 'month';
     expFormat.value = 'png';
     biweekWrap.style.display = 'none';
-    // اقترح بداية الأسبوعين = اليوم
     try{bwStart.valueAsDate = new Date();}catch{bwStart.value = new Date().toISOString().slice(0,10);}
   };
 
@@ -732,9 +930,13 @@ function initApp(){
   });
 
   // Inputs (input+blur)
-  [dayStart,dayEnd,dayBreak].forEach(el=>{
+  [dayStart,dayEnd,dayBreak,dayReason,taskNote].forEach(el=>{
     el.addEventListener('input',()=>{compute(); saveDayLocal();});
     el.addEventListener('blur', ()=>{compute(); saveDayLocal();});
+  });
+  dayStatus.addEventListener('change', ()=>{
+    reasonWrap.style.display = (dayStatus.value==='work') ? 'none' : 'block';
+    saveDayLocal();
   });
   dayDate.addEventListener('change',()=>{updateDayName(); loadDay(); saveDayLocal();});
 
@@ -745,13 +947,11 @@ function initApp(){
   closeExport.addEventListener('click',()=>exportModal.classList.remove('open'));
 
   doExport.addEventListener('click', ()=>{
-    const langSel = expLang.value;            // لغة التصدير
+    const langSel = expLang.value;
     const L = I18N[langSel] || I18N.en;
-    const scope = expScope.value;             // day | month | biweek
-    const fmt   = expFormat.value;            // png | json
+    const scope = expScope.value;
+    const fmt   = expFormat.value;
 
-    // إعداد الفترة بحسب النطاق
-    let titleText = L.month.title;
     let periodLabel = '';
     const basePerDay = Math.round(parseFloat(stDaily.value||8)*60);
 
@@ -759,33 +959,29 @@ function initApp(){
       periodLabel = dayDate.value;
       if(fmt==='png'){ exportDayPNGWithLang(L); }
       else{ exportDayJSONWithLang(langSel); }
-      exportModal.classList.remove('open');
-      return;
+      exportModal.classList.remove('open'); return;
     }
 
     if(scope==='month'){
       const month = monthPick.value || dayDate.value.slice(0,7);
       const [y,mo]=month.split('-').map(Number);
       const first=new Date(y,mo-1,1), last=new Date(y,mo,0);
-      const {rows} = buildRowsForRange(first, last, basePerDay);
+      const {rows,annotations} = buildDataForRange(first, last, basePerDay);
       periodLabel = month;
-      if(fmt==='png'){ exportPeriodPNG(L, L.month.title, month, rows); }
-      else{ exportRowsJSON('month', month, rows, langSel); }
-      exportModal.classList.remove('open');
-      return;
+      if(fmt==='png'){ exportPeriodPNG(L, L.month.title, periodLabel, rows, annotations); }
+      else{ exportRowsJSON('month', periodLabel, rows, langSel, annotations); }
+      exportModal.classList.remove('open'); return;
     }
 
     if(scope==='biweek'){
       const start = bwStart.value ? new Date(bwStart.value) : new Date();
-      const end   = new Date(start); end.setDate(start.getDate()+13); // 14 يوم
-      const {rows} = buildRowsForRange(start, end, basePerDay);
-      const p = n=>String(n).padStart(2,'0');
-      periodLabel = `${start.getFullYear()}-${p(start.getMonth()+1)}-${p(start.getDate())}_to_${end.getFullYear()}-${p(end.getMonth()+1)}-${p(end.getDate())}`;
-      titleText = (L.export.optBi || 'Two Weeks');
-      if(fmt==='png'){ exportPeriodPNG(L, titleText, periodLabel, rows); }
-      else{ exportRowsJSON('biweek', periodLabel, rows, langSel); }
-      exportModal.classList.remove('open');
-      return;
+      const end   = new Date(start); end.setDate(start.getDate()+13);
+      const {rows,annotations} = buildDataForRange(start, end, basePerDay);
+      periodLabel = periodLabelFromDates(start,end);
+      const titleText = (L.export.optBi || 'Two Weeks');
+      if(fmt==='png'){ exportPeriodPNG(L, titleText, periodLabel, rows, annotations); }
+      else{ exportRowsJSON('biweek', periodLabel, rows, langSel, annotations); }
+      exportModal.classList.remove('open'); return;
     }
   });
 
@@ -801,4 +997,4 @@ function initApp(){
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initApp);}else{initApp();}
 </script>
 </body>
-      </html>
+</html>
