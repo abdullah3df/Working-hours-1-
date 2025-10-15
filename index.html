@@ -8,7 +8,6 @@
 <style>
 :root{
   --bg:#f6f8fb;--card:#fff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6;--shadow:0 12px 30px rgba(15,23,42,.08);
-  --space-1:6px; --space-2:10px; --space-3:14px; --space-4:18px;
 }
 .dark{--bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2b40;--accent:#60a5fa;--shadow:0 18px 40px rgba(0,0,0,.4)}
 *{box-sizing:border-box}
@@ -98,6 +97,9 @@ input[type="date"], input[type="time"]{direction:ltr;text-align:center}
 .dark .kcard{background:#0a1222;border-color:#1f2b40;color:#e5e7eb}
 .kcard h3{margin:0;color:var(--muted);font-size:13px}
 .kcard .val{font-size:20px;font-weight:800;margin-top:4px}
+.val.ok{color:#16a34a}
+.val.warn{color:#d97706}
+.val.bad{color:#ef4444}
 
 /* Day annotations (status + notes) */
 .annot-grid{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-top:12px}
@@ -144,7 +146,17 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 .badge.bad{color:#7f1d1d;background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.35)}
 .balance-btn{height:32px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);cursor:pointer}
 
-/* Animations + Focus */
+/* Toast */
+.toast{
+  position: fixed; right:16px; top:16px; z-index:120;
+  background: var(--card); color: var(--ink);
+  border:1px solid var(--line); border-radius:12px; padding:10px 12px;
+  box-shadow: var(--shadow); opacity:0; transform: translateY(-6px); pointer-events:none;
+  transition: .25s ease;
+}
+.toast.show{ opacity:1; transform: translateY(0) }
+
+/* Animations */
 .card, .dialog, .menu-drawer{transition: box-shadow .25s ease, transform .25s ease, background .25s ease, border-color .25s ease;}
 @media (prefers-reduced-motion: no-preference){
   .card{ animation: fadeUp .25s ease both; }
@@ -160,17 +172,7 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   border-radius: 12px;
 }
 
-/* Toast */
-.toast{
-  position: fixed; right:16px; top:16px; z-index:120;
-  background: var(--card); color: var(--ink);
-  border:1px solid var(--line); border-radius:12px; padding:10px 12px;
-  box-shadow: var(--shadow); opacity:0; transform: translateY(-6px); pointer-events:none;
-  transition: .25s ease;
-}
-.toast.show{ opacity:1; transform: translateY(0) }
-
-/* Mobile tweaks */
+/* Mobile */
 @media (max-width:720px){.topbar .inner{grid-template-columns:auto 1fr auto}.wrap{padding:10px}}
 @media (max-width:420px){.btn{height:36px;padding:5px 10px}.wrap{margin-bottom:110px}}
 </style>
@@ -205,13 +207,11 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
     <!-- Preferences -->
     <div class="menu-section">
       <div class="menu-title" id="prefTitle">Preferences</div>
-      <!-- Lang single row -->
       <div class="menu-row" id="langRow">
         <button class="lang-chip" data-lang="en" data-active="true">🌐 EN</button>
         <button class="lang-chip" data-lang="ar">🌐 AR</button>
         <button class="lang-chip" data-lang="de">🌐 DE</button>
       </div>
-      <!-- Dark mode (inside menu only) -->
       <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
         <label for="darkToggle" style="font-weight:700" id="lblTheme">Dark mode</label>
         <label class="switch" title="Dark mode">
@@ -262,7 +262,7 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
       </div>
     </div>
 
-    <!-- Day annotations -->
+    <!-- Annotations -->
     <div class="annot-grid">
       <div class="form-field">
         <label id="lblStatus">Day Status</label>
@@ -319,7 +319,6 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
     </div>
     <div id="monthArea" style="margin-top:12px"></div>
 
-    <!-- Notes section -->
     <div id="notesArea" style="margin-top:16px"></div>
 
     <div class="kpis">
@@ -331,7 +330,7 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   </div>
 </div>
 
-<!-- Export modal (unchanged from آخر نسخة ميزات) -->
+<!-- Export modal -->
 <div id="exportModal" class="modal" aria-hidden="true">
   <div class="dialog" style="max-width:620px">
     <h2 id="titleExport">Export</h2>
@@ -387,7 +386,7 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 <!-- html2canvas -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
 
-<!-- Firebase (Auth) + App -->
+<!-- Firebase + App -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
@@ -408,21 +407,20 @@ await setPersistence(auth, browserLocalPersistence);
 
 /* ================= I18N ================= */
 const I18N = {
-  ar:{dir:'rtl',brand:'ساعتي',nav:{menu:'القائمة',nav:'التنقل',day:'اليوم',month:'الشهري',settings:'الإعدادات',export:'تصدير',pref:'التفضيلات',acct:'الحساب'},day:{title:'الإدخال اليومي',hint:'أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.',date:'تاريخ',start:'🟢 دخول',end:'🔴 خروج',break:'☕️ استراحة (دقيقة)',k1:'صافي اليوم',k2:'إضافي اليوم',k3:'أساس اليوم (س)',k4:'حالة الحفظ',saved:'تم الحفظ تلقائيًا ✅',status:'حالة اليوم',statusVals:{work:'عمل',vacation:'إجازة',sick:'مرض',absent:'غياب'},reason:'سبب / ملاحظة',task:'ملاحظة مهمة'},settings:{title:'الإعدادات',hint:'اضبط القيم الافتراضية.',daily:'أساس اليوم (ساعات)',brdef:'استراحة افتراضية (دقيقة)',apply:'حفظ'},month:{title:'ملخص شهري',pick:'اختر الشهر',m1:'مجموع الشهر',m2:'أيام مسجلة',m3:'معدل اليوم',close:'إغلاق',refresh:'تحديث',thead:['التاريخ','البداية','النهاية','استراحة','الصافي','إضافي'],notesTitle:'ملاحظات',notesHead:['التاريخ','الحالة','سبب / ملاحظة','ملاحظة المهمة']},export:{title:'تصدير',scope:'النطاق',format:'الصيغة',optDay:'اليوم',optMonth:'الشهر',optBi:'أسبوعين',png:'صورة (PNG)',json:'JSON',cancel:'إلغاء',do:'تصدير',lang:'لغة التصدير',bwStart:'بداية الأسبوعين'} ,ui:{dark:'الوضع الداكن',balance:'الرصيد'}},
-  en:{dir:'ltr',brand:'Saaati',nav:{menu:'Menu',nav:'Navigation',day:'Day',month:'Monthly',settings:'Settings',export:'Export',pref:'Preferences',acct:'Account'},day:{title:'Daily Entry',hint:'Enter start, end and break. Autosaved locally.',date:'Date',start:'🟢 Clock In',end:'🔴 Clock Out',break:'☕️ Break (min)',k1:'Net Today',k2:'Overtime',k3:'Daily Base (h)',k4:'Save Status',saved:'Auto-saved ✅',status:'Day Status',statusVals:{work:'Work',vacation:'Vacation',sick:'Sick',absent:'Absent (Other)'},reason:'Reason / Note',task:'Task Note'},settings:{title:'Settings',hint:'Adjust defaults.',daily:'Daily Base (hours)',brdef:'Default Break (min)',apply:'Save'},month:{title:'Monthly Summary',pick:'Pick month',m1:'Month Total',m2:'Logged Days',m3:'Avg/Day',close:'Close',refresh:'Refresh',thead:['Date','Start','End','Break','Net','OT'],notesTitle:'Notes',notesHead:['Date','Status','Reason / Note','Task Note']},export:{title:'Export',scope:'Scope',format:'Format',optDay:'Day',optMonth:'Month',optBi:'Two Weeks',png:'Image (PNG)',json:'JSON',cancel:'Cancel',do:'Export',lang:'Export Language',bwStart:'Two Weeks Start'},ui:{dark:'Dark mode',balance:'Balance'}},
-  de:{dir:'ltr',brand:'Meine Stunden',nav:{menu:'Menü',nav:'Navigation',day:'Tag',month:'Monat',settings:'Einstellungen',export:'Export',pref:'Einstellungen',acct:'Konto'},day:{title:'Tägliche Eingabe',hint:'Start, Ende und Pause. Lokal automatisch gespeichert.',date:'Datum',start:'🟢 Einchecken',end:'🔴 Auschecken',break:'☕️ Pause (Min.)',k1:'Netto heute',k2:'Überstunden',k3:'Tages-Soll (Std)',k4:'Speicherstatus',saved:'Automatisch gespeichert ✅',status:'Tagesstatus',statusVals:{work:'Arbeit',vacation:'Urlaub',sick:'Krank',absent:'Abwesend'},reason:'Grund / Notiz',task:'Aufgaben-Notiz'},settings:{title:'Einstellungen',hint:'Standardwerte anpassen.',daily:'Tages-Soll (Std.)',brdef:'Standardpause (Min.)',apply:'Speichern'},month:{title:'Monatsübersicht',pick:'Monat wählen',m1:'Monatssumme',m2:'Erfasste Tage',m3:'Schnitt/Tag',close:'Schließen',refresh:'Aktualisieren',thead:['Datum','Start','Ende','Pause','Netto','ÜSt'],notesTitle:'Notizen',notesHead:['Datum','Status','Grund / Notiz','Aufgaben-Notiz']},export:{title:'Export',scope:'Bereich',format:'Format',optDay:'Tag',optMonth:'Monat',optBi:'Zwei Wochen',png:'Bild (PNG)',json:'JSON',cancel:'Abbrechen',do:'Exportieren',lang:'Exportsprache',bwStart:'Zwei-Wochen Start'},ui:{dark:'Dunkelmodus',balance:'Saldo'}}
+  ar:{dir:'rtl',brand:'ساعتي',nav:{menu:'القائمة',nav:'التنقل',day:'اليوم',month:'الشهري',settings:'الإعدادات',export:'تصدير',pref:'التفضيلات',acct:'الحساب'},day:{title:'الإدخال اليومي',hint:'أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.',date:'تاريخ',start:'🟢 دخول',end:'🔴 خروج',break:'☕️ استراحة (دقيقة)',k1:'صافي اليوم',k2:'إضافي اليوم',k3:'أساس اليوم (س)',k4:'حالة الحفظ',saved:'تم الحفظ تلقائيًا ✅',status:'حالة اليوم',statusVals:{work:'عمل',vacation:'إجازة',sick:'مرض',absent:'غياب'},reason:'سبب / ملاحظة',task:'ملاحظة مهمة',saveStates:{saving:'جارٍ الحفظ…',savedAt:'تم الحفظ عند',dirty:'تعديلات غير محفوظة',error:'خطأ في الحفظ'}},settings:{title:'الإعدادات',hint:'اضبط القيم الافتراضية.',daily:'أساس اليوم (ساعات)',brdef:'استراحة افتراضية (دقيقة)',apply:'حفظ'},month:{title:'ملخص شهري',pick:'اختر الشهر',m1:'مجموع الشهر',m2:'أيام مسجلة',m3:'معدل اليوم',close:'إغلاق',refresh:'تحديث',thead:['التاريخ','البداية','النهاية','استراحة','الصافي','إضافي'],notesTitle:'ملاحظات',notesHead:['التاريخ','الحالة','سبب / ملاحظة','ملاحظة المهمة']},export:{title:'تصدير',scope:'النطاق',format:'الصيغة',optDay:'اليوم',optMonth:'الشهر',optBi:'أسبوعين',png:'صورة (PNG)',json:'JSON',cancel:'إلغاء',do:'تصدير',lang:'لغة التصدير',bwStart:'بداية الأسبوعين'} ,ui:{dark:'الوضع الداكن',balance:'الرصيد'}},
+  en:{dir:'ltr',brand:'Saaati',nav:{menu:'Menu',nav:'Navigation',day:'Day',month:'Monthly',settings:'Settings',export:'Export',pref:'Preferences',acct:'Account'},day:{title:'Daily Entry',hint:'Enter start, end and break. Autosaved locally.',date:'Date',start:'🟢 Clock In',end:'🔴 Clock Out',break:'☕️ Break (min)',k1:'Net Today',k2:'Overtime',k3:'Daily Base (h)',k4:'Save Status',saved:'Auto-saved ✅',status:'Day Status',statusVals:{work:'Work',vacation:'Vacation',sick:'Sick',absent:'Absent (Other)'},reason:'Reason / Note',task:'Task Note',saveStates:{saving:'Saving…',savedAt:'Saved at',dirty:'Unsaved changes',error:'Save error'}},settings:{title:'Settings',hint:'Adjust defaults.',daily:'Daily Base (hours)',brdef:'Default Break (min)',apply:'Save'},month:{title:'Monthly Summary',pick:'Pick month',m1:'Month Total',m2:'Logged Days',m3:'Avg/Day',close:'Close',refresh:'Refresh',thead:['Date','Start','End','Break','Net','OT'],notesTitle:'Notes',notesHead:['Date','Status','Reason / Note','Task Note']},export:{title:'Export',scope:'Scope',format:'Format',optDay:'Day',optMonth:'Month',optBi:'Two Weeks',png:'Image (PNG)',json:'JSON',cancel:'Cancel',do:'Export',lang:'Export Language',bwStart:'Two Weeks Start'},ui:{dark:'Dark mode',balance:'Balance'}},
+  de:{dir:'ltr',brand:'Meine Stunden',nav:{menu:'Menü',nav:'Navigation',day:'Tag',month:'Monat',settings:'Einstellungen',export:'Export',pref:'Einstellungen',acct:'Konto'},day:{title:'Tägliche Eingabe',hint:'Start, Ende und Pause. Lokal automatisch gespeichert.',date:'Datum',start:'🟢 Einchecken',end:'🔴 Auschecken',break:'☕️ Pause (Min.)',k1:'Netto heute',k2:'Überstunden',k3:'Tages-Soll (Std)',k4:'Speicherstatus',saved:'Automatisch gespeichert ✅',status:'Tagesstatus',statusVals:{work:'Arbeit',vacation:'Urlaub',sick:'Krank',absent:'Abwesend'},reason:'Grund / Notiz',task:'Aufgaben-Notiz',saveStates:{saving:'Speichern…',savedAt:'Gespeichert um',dirty:'Ungespeicherte Änderungen',error:'Speicherfehler'}},settings:{title:'Einstellungen',hint:'Standardwerte anpassen.',daily:'Tages-Soll (Std.)',brdef:'Standardpause (Min.)',apply:'Speichern'},month:{title:'Monatsübersicht',pick:'Monat wählen',m1:'Monatssumme',m2:'Erfasste Tage',m3:'Schnitt/Tag',close:'Schließen',refresh:'Aktualisieren',thead:['Datum','Start','Ende','Pause','Netto','ÜSt'],notesTitle:'Notizen',notesHead:['Datum','Status','Grund / Notiz','Aufgaben-Notiz']},export:{title:'Export',scope:'Bereich',format:'Format',optDay:'Tag',optMonth:'Monat',optBi:'Zwei Wochen',png:'Bild (PNG)',json:'JSON',cancel:'Abbrechen',do:'Exportieren',lang:'Exportsprache',bwStart:'Zwei-Wochen Start'},ui:{dark:'Dunkelmodus',balance:'Saldo'}}
 };
 
 /* Defaults */
 const LS_LANG='saaati_lang';
 let currentLang = localStorage.getItem(LS_LANG) || 'en';
 
-/* Refs */
+/* Refs (shortened for clarity—نفس اللي عندك) */
 const menuToggle=document.getElementById('menuToggle');
 const menuDrawer=document.getElementById('menuDrawer');
 const brandTxt=document.getElementById('brandTxt');
 const userPill=document.getElementById('userPill');
-
 const navTitle=document.getElementById('navTitle');
 const prefTitle=document.getElementById('prefTitle');
 const acctTitle=document.getElementById('acctTitle');
@@ -448,7 +446,6 @@ const k2=document.getElementById('k2');
 const k3=document.getElementById('k3');
 const k4=document.getElementById('k4');
 
-/* New refs for annotations */
 const lblStatus=document.getElementById('lblStatus');
 const dayStatus=document.getElementById('dayStatus');
 const reasonWrap=document.getElementById('reasonWrap');
@@ -500,22 +497,39 @@ const dayName=document.getElementById('dayName');
 const stDaily=document.getElementById('stDaily');
 const stBreak=document.getElementById('stBreak');
 
-/* Bottom balance */
 const balanceText=document.getElementById('balanceText');
 const balanceBadge=document.getElementById('balanceBadge');
 const balScopeBtn=document.getElementById('balScopeBtn');
-
-/* Language chips & Dark toggle */
 const langRow=document.getElementById('langRow');
 const darkToggle=document.getElementById('darkToggle');
 
-/* Toast */
 const toast = document.getElementById('toast');
 
-/* Theme switch UI */
+/* ========= Save status manager ========= */
+let dirty=false;
+let saveTimer=null;
+function nowTimeHHMMSS(){const d=new Date(); const p=n=>String(n).padStart(2,'0'); return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;}
+function setSaveState(state,msg=''){
+  // reset classes
+  dSave.classList.remove('ok','warn','bad');
+  const SS = I18N[currentLang].day.saveStates;
+  if(state==='saving'){ dSave.textContent=SS.saving; dSave.classList.add('warn'); }
+  else if(state==='saved'){ dSave.textContent=`${SS.savedAt} ${msg||nowTimeHHMMSS()}`; dSave.classList.add('ok'); }
+  else if(state==='dirty'){ dSave.textContent=SS.dirty; dSave.classList.add('warn'); }
+  else if(state==='error'){ dSave.textContent=SS.error; dSave.classList.add('bad'); }
+  else { dSave.textContent='—'; }
+}
+function markDirty(){
+  dirty=true;
+  setSaveState('dirty');
+  if(saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{ saveDayLocal(); }, 800);
+}
+
+/* Theme */
 function applyDarkSwitchUI(){ darkToggle.checked = document.body.classList.contains('dark'); }
 
-/* Utilities */
+/* Utils */
 function h2m(h){if(!h)return 0; const [H,M]=h.split(':').map(Number); return H*60+(M||0);}
 function m2h(m){m=Math.max(0,Math.floor(m)); const hh=Math.floor(m/60), mm=m%60; return `${hh}:${String(mm).padStart(2,'0')}`;}
 function signed(m){const s=Math.sign(m); const abs=Math.abs(m); const t=`${Math.floor(abs/60)}:${String(abs%60).padStart(2,'0')}`; return (s>=0?`+${t}`:`-${t}`);}
@@ -523,24 +537,35 @@ function showToast(msg){ toast.textContent = msg; toast.classList.add('show'); s
 
 /* Settings */
 function loadSettings(){const s=JSON.parse(localStorage.getItem('settings')||'{}'); stDaily.value=s.daily??8; stBreak.value=s.break??30; dBase.textContent=String(stDaily.value);}
-function saveSettings(){const s={daily:parseFloat(stDaily.value||8),break:parseInt(stBreak.value||30,10)}; localStorage.setItem('settings',JSON.stringify(s)); dBase.textContent=String(s.daily); notifySaved(); updateBalanceBar();}
+function saveSettings(){const s={daily:parseFloat(stDaily.value||8),break:parseInt(stBreak.value||30,10)}; localStorage.setItem('settings',JSON.stringify(s)); dBase.textContent=String(s.daily); showToast(I18N[currentLang].day.saved); updateBalanceBar();}
 
-/* Day */
+/* Day compute */
 function updateDayName(){const lang=currentLang; if(!dayDate.value){try{dayDate.valueAsDate=new Date();}catch{dayDate.value=new Date().toISOString().slice(0,10);} } try{const fmt=new Intl.DateTimeFormat(lang==='ar'?'ar-EG':lang==='de'?'de-DE':'en-GB',{weekday:'long'}); dayName.textContent=fmt.format(new Date(dayDate.value));}catch{dayName.textContent='—';}}
 function compute(){const base=Math.round(parseFloat(stDaily.value||8)*60); const s=dayStart.value,e=dayEnd.value,br=Math.max(0, parseInt(dayBreak.value||0,10) || 0); if(!s||!e){dNet.textContent='0:00'; dOT.textContent='0:00'; return;} let sm=h2m(s), em=h2m(e); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-br); const ot=Math.max(0,net-base); dNet.textContent=m2h(net); dOT.textContent=m2h(ot); dBase.textContent=String(stDaily.value||8);}
-function notifySaved(){const L=I18N[currentLang]; showToast(L.day.saved || 'Saved ✅');}
+
+/* Save/Load day */
 function saveDayLocal(){
-  const p={
-    date:dayDate.value,
-    start:dayStart.value,
-    end:dayEnd.value,
-    break:parseInt(dayBreak.value||0,10),
-    status:dayStatus.value,
-    reason:dayReason.value||'',
-    taskNote:taskNote.value||''
-  };
-  localStorage.setItem('day-'+p.date,JSON.stringify(p));
-  notifySaved(); updateBalanceBar();
+  if(saveTimer){ clearTimeout(saveTimer); saveTimer=null; }
+  setSaveState('saving');
+  try{
+    const p={
+      date:dayDate.value,
+      start:dayStart.value,
+      end:dayEnd.value,
+      break:parseInt(dayBreak.value||0,10),
+      status:dayStatus.value,
+      reason:dayReason.value||'',
+      taskNote:taskNote.value||''
+    };
+    localStorage.setItem('day-'+p.date,JSON.stringify(p));
+    dirty=false;
+    setSaveState('saved');
+    showToast(I18N[currentLang].day.saved);
+    updateBalanceBar();
+  }catch(e){
+    console.error('Save error', e);
+    setSaveState('error');
+  }
 }
 function loadDay(){
   const raw=localStorage.getItem('day-'+dayDate.value);
@@ -561,12 +586,13 @@ function loadDay(){
     dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30;
     dayStatus.value='work'; dayReason.value=''; taskNote.value='';
   }
-  // toggle reason field
   reasonWrap.style.display = (dayStatus.value==='work') ? 'none' : 'block';
   compute();
+  dirty=false;
+  setSaveState('saved'); // loaded state considered up-to-date
 }
 
-/* Month table + Notes */
+/* Month + Notes */
 function buildMonthTableHead(lang){const L=I18N[lang]; const thead=monthArea.querySelector('thead'); if(thead){thead.innerHTML=`<tr>${L.month.thead.map(h=>`<th>${h}</th>`).join('')}</tr>`;}}
 function buildNotesTable(lang, annotations){
   const L=I18N[lang];
@@ -580,7 +606,6 @@ function buildNotesTable(lang, annotations){
   html += `</tbody></table>`;
   notesArea.innerHTML = html;
 }
-
 function openMonth(){if(!monthPick.value){monthPick.value=dayDate.value.slice(0,7);} monthModal.classList.add('open'); monthModal.setAttribute('aria-hidden','false'); refreshMonthSummary();}
 function refreshMonthSummary(){
   const month=monthPick.value||dayDate.value.slice(0,7);
@@ -589,15 +614,11 @@ function refreshMonthSummary(){
   const baseDay=Math.round(parseFloat(stDaily.value||8)*60);
   const rows=[]; let total=0, daysCount=0;
   const annotations=[];
-
-  // iterate days in month
   for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){
     const key='day-'+d.toISOString().slice(0,10);
     const raw=localStorage.getItem(key); if(!raw) continue;
     try{
       const p=JSON.parse(raw);
-
-      // Add working rows (only if there are times) -> preserves old totals/avg
       if(p.start&&p.end){
         let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440;
         const net=Math.max(0,(em-sm)-parseInt(p.break||0,10));
@@ -605,16 +626,12 @@ function refreshMonthSummary(){
         rows.push([key.slice(4),p.start,p.end,p.break||0,m2h(net),m2h(ot)]);
         total+=net; daysCount++;
       }
-
-      // Collect annotations if non-work status or any task note
       const nonWork = p.status && p.status!=='work';
       const hasTask = p.taskNote && p.taskNote.trim().length>0;
       if(nonWork || hasTask){
-        const lang=currentLang, L=I18N[lang];
-        const map=L.day.statusVals;
+        const L=I18N[currentLang], map=L.day.statusVals;
         annotations.push({
           date:key.slice(4),
-          status:p.status||'work',
           statusLabel: (map && map[p.status||'work']) || (p.status||'work'),
           reason:p.reason||'',
           taskNote:p.taskNote||''
@@ -622,33 +639,23 @@ function refreshMonthSummary(){
       }
     }catch{}
   }
-
   rows.sort((a,b)=>a[0]<b[0]?-1:1);
   annotations.sort((a,b)=>a.date<b.date?-1:1);
-
-  // render main table
-  const lang=currentLang; const L=I18N[lang];
   let html=`<table class="table"><thead></thead><tbody>`;
   rows.forEach(r=> html+=`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`);
   html+='</tbody></table>';
   monthArea.innerHTML=html;
-  monthArea.dataset.built='1'; buildMonthTableHead(lang);
-
-  // KPIs (unchanged behavior)
+  monthArea.dataset.built='1'; buildMonthTableHead(currentLang);
   mTotal.textContent=m2h(total); mDays.textContent=String(daysCount); mAvg.textContent=daysCount?m2h(Math.round(total/daysCount)):'0:00';
-
-  // render notes table
-  buildNotesTable(lang, annotations);
-
+  buildNotesTable(currentLang, annotations);
   updateBalanceBar();
 }
 
-/* Export helpers */
+/* Export helpers (مختصرة: نفس نسختك السابقة) */
 async function nodeToPNGAndDownload(node,filename){if(typeof html2canvas==='undefined'){alert('Image export unavailable.');return;} document.body.appendChild(node); const canvas=await html2canvas(node,{scale:2,backgroundColor:'#ffffff'}); const dataURL=canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=dataURL; a.download=filename.endsWith('.png')?filename:`${filename}.png`; a.click(); node.remove();}
 function tsNow(){ const d=new Date(), p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
 function periodLabelFromDates(start,end){const p=n=>String(n).padStart(2,'0'); return `${start.getFullYear()}-${p(start.getMonth()+1)}-${p(start.getDate())}_to_${end.getFullYear()}-${p(end.getMonth()+1)}-${p(end.getDate())}`}
 
-/* Build rows + annotations within a period [d0..d1] inclusive */
 function buildDataForRange(d0, d1, basePerDay){
   const rows=[]; let total=0, daysCount=0;
   const annotations=[];
@@ -682,7 +689,6 @@ function buildDataForRange(d0, d1, basePerDay){
   return {rows,total,daysCount,annotations};
 }
 
-/* Export (use chosen expLang) */
 function exportDayPNGWithLang(L){
   const node=document.createElement('div'); node.lang=expLang.value; node.dir=L.dir;
   node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff; width:760px;';
@@ -704,27 +710,25 @@ function exportDayPNGWithLang(L){
   node.innerHTML=html;
   nodeToPNGAndDownload(node,`day-${dayDate.value}.png`);
 }
-
 function exportPeriodPNG(L, title, periodLabel, rows, annotations){
   const node=document.createElement('div'); node.lang=expLang.value; node.dir=L.dir;
   node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff; width:900px;';
-
   let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
       <h2 style="margin:0">${title}</h2><div>${tsNow()}</div>
     </div>
     <div style="margin-bottom:8px;font-weight:700">${periodLabel}</div>
     <table style="width:100%;border-collapse:separate;border-spacing:0 8px">
-      <thead><tr>${L.month.thead.map(h=>`<th style="text-align:center;color:#475569;font-size:13px">${h}</th>`).join('')}</tr></thead>
+      <thead><tr>${I18N[expLang.value].month.thead.map(h=>`<th style="text-align:center;color:#475569;font-size:13px">${h}</th>`).join('')}</tr></thead>
       <tbody>`;
   rows.forEach(r=>{ html+=`<tr style="background:#fff;border:1px solid #e2e8f0">
       <td style="padding:8px 10px">${r[0]}</td><td style="padding:8px 10px">${r[1]}</td>
       <td style="padding:8px 10px">${r[2]}</td><td style="padding:8px 10px">${r[3]}</td>
       <td style="padding:8px 10px">${r[4]}</td><td style="padding:8px 10px">${r[5]}</td></tr>`;});
   html+=`</tbody></table>`;
-
   if(annotations.length){
-    const head=L.month.notesHead;
-    html+=`<div style="margin-top:12px"><h3 style="margin:8px 0">${L.month.notesTitle}</h3>
+    const Lx=I18N[expLang.value];
+    const head=Lx.month.notesHead;
+    html+=`<div style="margin-top:12px"><h3 style="margin:8px 0">${Lx.month.notesTitle}</h3>
       <table style="width:100%;border-collapse:separate;border-spacing:0 8px">
         <thead><tr>${head.map(h=>`<th style="text-align:left;color:#475569;font-size:13px">${h}</th>`).join('')}</tr></thead><tbody>`;
     annotations.forEach(a=>{
@@ -736,18 +740,15 @@ function exportPeriodPNG(L, title, periodLabel, rows, annotations){
     });
     html+=`</tbody></table></div>`;
   }
-
   node.innerHTML=html;
   nodeToPNGAndDownload(node,`period-${periodLabel}.png`);
 }
-
 function exportDayJSONWithLang(lang){
   const data={meta:{scope:'day',lang,date:dayDate.value,exportedAt:new Date().toISOString()},
     payload:{date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10),status:dayStatus.value,reason:dayReason.value||'',taskNote:taskNote.value||''}};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`day-${dayDate.value}.json`; a.click(); URL.revokeObjectURL(url);
 }
-
 function exportRowsJSON(scopeLabel, periodLabel, rows, lang, annotations){
   const data={meta:{scope:scopeLabel,period:periodLabel,lang,exportedAt:new Date().toISOString()},rows,annotations};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
@@ -776,9 +777,7 @@ function setLang(lang){
 
   titleDay.textContent=L.day.title; hintDay.textContent=L.day.hint; lblDate.textContent=L.day.date; lblStart.textContent=L.day.start; lblEnd.textContent=L.day.end; lblBreak.textContent=L.day.break; k1.textContent=L.day.k1; k2.textContent=L.day.k2; k3.textContent=L.day.k3; k4.textContent=L.day.k4;
 
-  // annotations labels
   lblStatus.textContent=L.day.status;
-  // update options text
   const optsMap = L.day.statusVals;
   dayStatus.options[0].text = optsMap.work;
   dayStatus.options[1].text = optsMap.vacation;
@@ -813,12 +812,11 @@ function setLang(lang){
   if(monthArea.dataset.built==='1'){buildMonthTableHead(lang);}
 }
 
-/* Balance bar with scope (all or month) */
+/* Balance */
 let balanceScope = localStorage.getItem('balance_scope') || 'all';
 function computeBalanceMinutes(scope='all'){
   const basePerDay = Math.round(parseFloat(stDaily.value||8)*60);
   let bal = 0;
-
   if(scope === 'month'){
     const month = monthPick.value || dayDate.value.slice(0,7);
     const [y,mo]=month.split('-').map(Number);
@@ -827,7 +825,7 @@ function computeBalanceMinutes(scope='all'){
       const key='day-'+d.toISOString().slice(0,10);
       const raw=localStorage.getItem(key); if(!raw) continue;
       try{
-        const p=JSON.parse(raw); if(!(p.start&&p.end)) continue; // unchanged
+        const p=JSON.parse(raw); if(!(p.start&&p.end)) continue;
         let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440;
         const net=Math.max(0,(em-sm)-parseInt(p.break||0,10));
         bal += (net - basePerDay);
@@ -835,14 +833,12 @@ function computeBalanceMinutes(scope='all'){
     }
     return bal;
   }
-
-  // all
   for(let i=0;i<localStorage.length;i++){
     const key = localStorage.key(i);
     if(!key||!key.startsWith('day-')) continue;
     try{
       const p = JSON.parse(localStorage.getItem(key));
-      if(!(p && p.start && p.end)) continue; // unchanged
+      if(!(p && p.start && p.end)) continue;
       let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440;
       const net=Math.max(0,(em-sm)-parseInt(p.break||0,10));
       bal += (net - basePerDay);
@@ -880,13 +876,13 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-/* Drawer + interactions */
+/* Drawer + init */
 function showCard(card){[dayCard,settingsCard].forEach(el=>el.style.display='none'); card.style.display='block';}
 function openExport(){exportModal.classList.add('open'); exportModal.setAttribute('aria-hidden','false');}
+
 function initApp(){
   if(!localStorage.getItem(LS_LANG)){ localStorage.setItem(LS_LANG,'en'); currentLang='en'; }
 
-  // Drawer open/close
   menuToggle.onclick=()=>{
     const willOpen=!menuDrawer.classList.contains('open');
     menuDrawer.classList.toggle('open',willOpen);
@@ -902,17 +898,14 @@ function initApp(){
   });
   menuDrawer.addEventListener('click',e=>e.stopPropagation());
 
-  // Language chips
   langRow.querySelectorAll('.lang-chip').forEach(ch=>{
     ch.addEventListener('click', ()=> setLang(ch.dataset.lang));
   });
 
-  // Dark switch
   darkToggle.addEventListener('change', ()=>{
     document.body.classList.toggle('dark', darkToggle.checked);
   });
 
-  // Menu actions
   mnuDay.onclick=()=>{showCard(dayCard); menuDrawer.classList.remove('open');};
   mnuSettings.onclick=()=>{loadSettings(); showCard(settingsCard); menuDrawer.classList.remove('open');};
   mnuMonth.onclick=()=>{openMonth(); menuDrawer.classList.remove('open');};
@@ -924,23 +917,21 @@ function initApp(){
     try{bwStart.valueAsDate = new Date();}catch{bwStart.value = new Date().toISOString().slice(0,10);}
   };
 
-  // Export UI toggles
   expScope.addEventListener('change', ()=>{
     biweekWrap.style.display = (expScope.value==='biweek') ? 'block' : 'none';
   });
 
-  // Inputs (input+blur)
+  // Inputs: mark dirty + debounce save; blur = immediate save
   [dayStart,dayEnd,dayBreak,dayReason,taskNote].forEach(el=>{
-    el.addEventListener('input',()=>{compute(); saveDayLocal();});
-    el.addEventListener('blur', ()=>{compute(); saveDayLocal();});
+    el.addEventListener('input',()=>{ compute(); markDirty(); });
+    el.addEventListener('blur', ()=>{ compute(); saveDayLocal(); });
   });
   dayStatus.addEventListener('change', ()=>{
     reasonWrap.style.display = (dayStatus.value==='work') ? 'none' : 'block';
-    saveDayLocal();
+    markDirty();
   });
-  dayDate.addEventListener('change',()=>{updateDayName(); loadDay(); saveDayLocal();});
+  dayDate.addEventListener('change',()=>{ updateDayName(); loadDay(); });
 
-  // Settings + month + export
   applySettings.addEventListener('click',()=>{saveSettings(); compute();});
   refreshMonth.addEventListener('click',()=>{refreshMonthSummary();});
   closeMonth.addEventListener('click',()=>monthModal.classList.remove('open'));
@@ -985,7 +976,6 @@ function initApp(){
     }
   });
 
-  // Init values
   try{dayDate.valueAsDate=new Date();}catch{dayDate.value=new Date().toISOString().slice(0,10);}
   setLang(currentLang);
   loadSettings();
@@ -993,8 +983,13 @@ function initApp(){
   compute();
   applyDarkSwitchUI();
   updateBalanceBar();
+
+  // تحذير اختياري عند وجود تغييرات غير محفوظة (غالباً لن يظهر لأن عند blur نحفظ)
+  window.addEventListener('beforeunload', (e)=>{
+    if(dirty){ e.preventDefault(); e.returnValue=''; }
+  });
 }
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initApp);}else{initApp();}
 </script>
 </body>
-</html>
+  </html>
