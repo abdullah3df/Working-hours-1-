@@ -6,10 +6,21 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <title>Saaati — Home</title>
 <style>
-:root{--bg:#f6f8fb;--card:#fff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6;--shadow:0 12px 30px rgba(15,23,42,.08)}
+:root{
+  --bg:#f6f8fb;--card:#fff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6;--shadow:0 12px 30px rgba(15,23,42,.08);
+  --space-1:6px; --space-2:10px; --space-3:14px; --space-4:18px;
+}
 .dark{--bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2b40;--accent:#60a5fa;--shadow:0 18px 40px rgba(0,0,0,.4)}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(1200px 600px at 10% -10%,rgba(59,130,246,.08),transparent),radial-gradient(1000px 600px at 110% -20%,rgba(22,163,74,.08),transparent),var(--bg);color:var(--ink);font-family:system-ui,"Noto Naskh Arabic","Cairo",Tahoma,Arial,sans-serif}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 10% -10%,rgba(59,130,246,.08),transparent),
+    radial-gradient(1000px 600px at 110% -20%,rgba(22,163,74,.08),transparent),
+    var(--bg);
+  color:var(--ink);
+  font-family:system-ui,"Noto Naskh Arabic","Cairo",Tahoma,Arial,sans-serif
+}
 
 /* Topbar */
 .topbar{position:sticky;top:0;z-index:60;background:color-mix(in srgb, var(--card) 92%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
@@ -37,24 +48,28 @@ body{margin:0;background:radial-gradient(1200px 600px at 10% -10%,rgba(59,130,24
 .hr{height:1px;background:var(--line);border:0;margin:12px 0}
 
 /* Lang row (single line) */
-.lang-chip{padding:8px 10px;border:1px solid var(--line);background:var(--card);border-radius:999px;cursor:pointer}
+.lang-chip{padding:8px 10px;border:1px solid var(--line);background:var(--card);border-radius:999px;cursor:pointer;font-weight:700}
 .lang-chip[data-active="true"]{border-color:color-mix(in srgb, var(--accent) 40%, transparent);outline:2px solid color-mix(in srgb, var(--accent) 18%, transparent)}
 
-/* Toggle */
-.switch{position:relative;display:inline-block;width:46px;height:26px;vertical-align:middle}
+/* Dark switch inside menu */
+.switch{position:relative;display:inline-block;width:52px;height:28px}
 .switch input{display:none}
-.slider{position:absolute;cursor:pointer;inset:0;background:#cbd5e1;border-radius:999px;transition:.2s}
-.slider:before{content:"";position:absolute;height:22px;width:22px;left:2px;top:2px;background:white;border-radius:50%;transition:.2s}
+.slider{position:absolute;inset:0;border-radius:999px;background:#cbd5e1;transition:.2s}
+.slider::before{
+  content:"🌙"; position:absolute; inset:2px auto auto 2px;
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+  background:#fff;border-radius:50%; transition:.2s; font-size:14px;
+}
 input:checked + .slider{background:#60a5fa}
-input:checked + .slider:before{transform:translateX(20px)}
+input:checked + .slider::before{content:"☀️"; transform:translateX(24px)}
 
 /* Layout */
-.wrap{max-width:980px;margin:18px auto 80px;padding:12px}
+.wrap{max-width:980px;margin:18px auto 100px;padding:12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
 h1{margin:0 0 8px;font-size:22px}
 p.small{color:var(--muted);margin:0 0 12px}
 
-/* Date row */
+/* Inputs */
 .date-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-bottom:8px}
 .date-input label{display:block;color:var(--muted);font-size:13px;margin:0 0 4px}
 .input{width:100%;height:46px;padding:10px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#0f172a;font-weight:700}
@@ -113,10 +128,37 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 .badge{padding:4px 8px; border-radius:999px; font-size:12px; font-weight:700}
 .badge.ok{color:#065f46;background:rgba(16,185,129,.18);border:1px solid rgba(16,185,129,.35)}
 .badge.bad{color:#7f1d1d;background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.35)}
+.balance-btn{height:32px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);cursor:pointer}
+
+/* Animations + Focus */
+.card, .dialog, .menu-drawer{transition: box-shadow .25s ease, transform .25s ease, background .25s ease, border-color .25s ease;}
+@media (prefers-reduced-motion: no-preference){
+  .card{ animation: fadeUp .25s ease both; }
+  .menu-drawer.open{ animation: slideIn .22s ease both; }
+}
+@keyframes fadeUp{ from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
+@keyframes slideIn{ from{transform:translateX(-100%)} to{transform:translateX(0)} }
+[dir="rtl"] @keyframes slideIn{ from{transform:translateX(100%)} to{transform:translateX(0)} }
+
+:focus-visible{
+  outline: 2px solid color-mix(in srgb, var(--accent) 65%, white);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/* Toast */
+.toast{
+  position: fixed; right:16px; top:16px; z-index:120;
+  background: var(--card); color: var(--ink);
+  border:1px solid var(--line); border-radius:12px; padding:10px 12px;
+  box-shadow: var(--shadow); opacity:0; transform: translateY(-6px); pointer-events:none;
+  transition: .25s ease;
+}
+.toast.show{ opacity:1; transform: translateY(0) }
 
 /* Mobile tweaks */
 @media (max-width:720px){.topbar .inner{grid-template-columns:auto 1fr auto}.wrap{padding:10px}}
-@media (max-width:420px){.btn{height:36px;padding:5px 10px}.wrap{margin-bottom:92px}}
+@media (max-width:420px){.btn{height:36px;padding:5px 10px}.wrap{margin-bottom:110px}}
 </style>
 </head>
 <body>
@@ -133,7 +175,7 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 <!-- Drawer Menu -->
 <div id="menuDrawer" class="menu-drawer" aria-hidden="true">
   <div class="menu-scroller">
-    <!-- Section: Navigation -->
+    <!-- Navigation -->
     <div class="menu-section">
       <div class="menu-title" id="navTitle">Navigation</div>
       <div class="menu-list">
@@ -146,16 +188,16 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 
     <hr class="hr" />
 
-    <!-- Section: Preferences -->
+    <!-- Preferences -->
     <div class="menu-section">
       <div class="menu-title" id="prefTitle">Preferences</div>
-      <!-- Single-line language row -->
+      <!-- Lang single row -->
       <div class="menu-row" id="langRow">
         <button class="lang-chip" data-lang="en" data-active="true">🌐 EN</button>
         <button class="lang-chip" data-lang="ar">🌐 AR</button>
         <button class="lang-chip" data-lang="de">🌐 DE</button>
       </div>
-      <!-- Dark mode toggle INSIDE menu -->
+      <!-- Dark mode (inside menu only) -->
       <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
         <label for="darkToggle" style="font-weight:700" id="lblTheme">Dark mode</label>
         <label class="switch" title="Dark mode">
@@ -167,7 +209,7 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 
     <hr class="hr" />
 
-    <!-- Section: Account -->
+    <!-- Account -->
     <div class="menu-section">
       <div class="menu-title" id="acctTitle">Account</div>
       <div class="menu-list">
@@ -281,9 +323,13 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 <div class="bottom-bar">
   <div class="balance-chip">
     <span id="balanceText">Balance</span>
+    <button id="balScopeBtn" class="balance-btn" title="Toggle scope">All</button>
     <span id="balanceBadge" class="badge ok">+0:00</span>
   </div>
 </div>
+
+<!-- Toast -->
+<div id="toast" class="toast">Saved ✅</div>
 
 <!-- html2canvas -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
@@ -314,7 +360,7 @@ const I18N = {
   de:{dir:'ltr',brand:'Meine Stunden',nav:{menu:'Menü',nav:'Navigation',day:'Tag',month:'Monat',settings:'Einstellungen',export:'Export',pref:'Einstellungen',acct:'Konto'},day:{title:'Tägliche Eingabe',hint:'Start, Ende und Pause. Lokal automatisch gespeichert.',date:'Datum',start:'🟢 Einchecken',end:'🔴 Auschecken',break:'☕️ Pause (Min.)',k1:'Netto heute',k2:'Überstunden',k3:'Tages-Soll (Std)',k4:'Speicherstatus',saved:'Automatisch gespeichert ✅'},settings:{title:'Einstellungen',hint:'Standardwerte anpassen.',daily:'Tages-Soll (Std.)',brdef:'Standardpause (Min.)',apply:'Speichern'},month:{title:'Monatsübersicht',pick:'Monat wählen',m1:'Monatssumme',m2:'Erfasste Tage',m3:'Schnitt/Tag',close:'Schließen',refresh:'Aktualisieren',thead:['Datum','Start','Ende','Pause','Netto','ÜSt']},export:{title:'Export',scope:'Bereich',format:'Format',optDay:'Heutiger Tag',optMonth:'Gewählter Monat',png:'Bild (PNG)',json:'JSON',cancel:'Abbrechen',do:'Exportieren'},ui:{dark:'Dunkelmodus',balance:'Saldo'}}
 };
 
-/* Default language = EN */
+/* Defaults */
 const LS_LANG='saaati_lang';
 let currentLang = localStorage.getItem(LS_LANG) || 'en';
 
@@ -390,20 +436,23 @@ const stBreak=document.getElementById('stBreak');
 /* Bottom balance */
 const balanceText=document.getElementById('balanceText');
 const balanceBadge=document.getElementById('balanceBadge');
+const balScopeBtn=document.getElementById('balScopeBtn');
 
-/* Language chips */
+/* Language chips & Dark toggle */
 const langRow=document.getElementById('langRow');
 const darkToggle=document.getElementById('darkToggle');
 
-/* Theme icon handled via switch only */
-function applyDarkSwitchUI(){
-  darkToggle.checked = document.body.classList.contains('dark');
-}
+/* Toast */
+const toast = document.getElementById('toast');
 
-/* Utils */
+/* Theme switch UI */
+function applyDarkSwitchUI(){ darkToggle.checked = document.body.classList.contains('dark'); }
+
+/* Utilities */
 function h2m(h){if(!h)return 0; const [H,M]=h.split(':').map(Number); return H*60+(M||0);}
 function m2h(m){m=Math.max(0,Math.floor(m)); const hh=Math.floor(m/60), mm=m%60; return `${hh}:${String(mm).padStart(2,'0')}`;}
 function signed(m){const s=Math.sign(m); const abs=Math.abs(m); const t=`${Math.floor(abs/60)}:${String(abs%60).padStart(2,'0')}`; return (s>=0?`+${t}`:`-${t}`);}
+function showToast(msg){ toast.textContent = msg; toast.classList.add('show'); setTimeout(()=> toast.classList.remove('show'), 1500); }
 
 /* Settings */
 function loadSettings(){const s=JSON.parse(localStorage.getItem('settings')||'{}'); stDaily.value=s.daily??8; stBreak.value=s.break??30; dBase.textContent=String(stDaily.value);}
@@ -412,7 +461,7 @@ function saveSettings(){const s={daily:parseFloat(stDaily.value||8),break:parseI
 /* Day */
 function updateDayName(){const lang=currentLang; if(!dayDate.value){try{dayDate.valueAsDate=new Date();}catch{dayDate.value=new Date().toISOString().slice(0,10);} } try{const fmt=new Intl.DateTimeFormat(lang==='ar'?'ar-EG':lang==='de'?'de-DE':'en-GB',{weekday:'long'}); dayName.textContent=fmt.format(new Date(dayDate.value));}catch{dayName.textContent='—';}}
 function compute(){const base=Math.round(parseFloat(stDaily.value||8)*60); const s=dayStart.value,e=dayEnd.value,br=Math.max(0, parseInt(dayBreak.value||0,10) || 0); if(!s||!e){dNet.textContent='0:00'; dOT.textContent='0:00'; return;} let sm=h2m(s), em=h2m(e); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-br); const ot=Math.max(0,net-base); dNet.textContent=m2h(net); dOT.textContent=m2h(ot); dBase.textContent=String(stDaily.value||8);}
-function notifySaved(){const L=I18N[currentLang]; dSave.textContent=L.day.saved || 'Saved ✅'; setTimeout(()=>dSave.textContent='—',1500);}
+function notifySaved(){const L=I18N[currentLang]; showToast(L.day.saved || 'Saved ✅');}
 function saveDayLocal(){const p={date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}; localStorage.setItem('day-'+p.date,JSON.stringify(p)); notifySaved(); updateBalanceBar(); }
 function loadDay(){const raw=localStorage.getItem('day-'+dayDate.value); if(raw){try{const p=JSON.parse(raw); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=p.break??(stBreak.value||30);}catch{dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30;}} else { dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30; } compute();}
 
@@ -426,7 +475,7 @@ async function nodeToPNGAndDownload(node,filename){if(typeof html2canvas==='unde
 function langFromStorage(){ return localStorage.getItem(LS_LANG) || 'en'; }
 function tsNow(){ const d=new Date(), p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
 
-/* Export */
+/* Export PNG/JSON (uses stored lang) */
 function exportDayPNG(){
   const lang=langFromStorage(), L=I18N[lang];
   const node=document.createElement('div'); node.lang=lang; node.dir=L.dir;
@@ -513,7 +562,7 @@ function setLang(lang){
 
   menuToggle.textContent=L.nav.menu;
   navTitle.textContent=L.nav.nav; prefTitle.textContent=L.nav.pref; acctTitle.textContent=L.nav.acct;
-  mnuDay.textContent=(lang==='ar'?'📅 '+L.nav.day: (lang==='de'?'📅 '+L.nav.day:'📅 '+L.nav.day));
+  mnuDay.textContent='📅 '+L.nav.day;
   mnuMonth.textContent='🗓️ '+L.nav.month;
   mnuSettings.textContent='⚙️ '+L.nav.settings;
   mnuExport.textContent='📦 '+L.nav.export;
@@ -534,10 +583,30 @@ function setLang(lang){
   if(monthArea.dataset.built==='1'){buildMonthTableHead(lang);}
 }
 
-/* Balance bar (sum of all (net - base) in localStorage) */
-function computeBalanceMinutes(){
+/* Balance bar with scope (all or month) */
+let balanceScope = localStorage.getItem('balance_scope') || 'all';
+function computeBalanceMinutes(scope='all'){
   const basePerDay = Math.round(parseFloat(stDaily.value||8)*60);
   let bal = 0;
+
+  if(scope === 'month'){
+    const month = monthPick.value || dayDate.value.slice(0,7);
+    const [y,mo]=month.split('-').map(Number);
+    const first=new Date(y,mo-1,1), last=new Date(y,mo,0);
+    for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){
+      const key='day-'+d.toISOString().slice(0,10);
+      const raw=localStorage.getItem(key); if(!raw) continue;
+      try{
+        const p=JSON.parse(raw); if(!(p.start&&p.end)) continue;
+        let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440;
+        const net=Math.max(0,(em-sm)-parseInt(p.break||0,10));
+        bal += (net - basePerDay);
+      }catch{}
+    }
+    return bal;
+  }
+
+  // all
   for(let i=0;i<localStorage.length;i++){
     const key = localStorage.key(i);
     if(!key||!key.startsWith('day-')) continue;
@@ -552,11 +621,18 @@ function computeBalanceMinutes(){
   return bal;
 }
 function updateBalanceBar(){
-  const mins = computeBalanceMinutes();
+  const mins = computeBalanceMinutes(balanceScope);
   balanceBadge.textContent = signed(mins);
   balanceBadge.classList.toggle('ok', mins>=0);
   balanceBadge.classList.toggle('bad', mins<0);
+  balScopeBtn.textContent = (balanceScope==='all' ? 'All' : 'Month');
 }
+balScopeBtn.addEventListener('click', ()=>{
+  balanceScope = (balanceScope==='all'?'month':'all');
+  localStorage.setItem('balance_scope', balanceScope);
+  updateBalanceBar();
+});
+monthPick?.addEventListener('change', ()=>{ if(balanceScope==='month') updateBalanceBar(); });
 
 /* Auth */
 authBtn.onclick = () => {
@@ -580,7 +656,7 @@ function openExport(){exportModal.classList.add('open'); exportModal.setAttribut
 function initApp(){
   if(!localStorage.getItem(LS_LANG)){ localStorage.setItem(LS_LANG,'en'); currentLang='en'; }
 
-  // Drawer
+  // Drawer open/close
   menuToggle.onclick=()=>{
     const willOpen=!menuDrawer.classList.contains('open');
     menuDrawer.classList.toggle('open',willOpen);
@@ -612,8 +688,11 @@ function initApp(){
   mnuMonth.onclick=()=>{openMonth(); menuDrawer.classList.remove('open');};
   mnuExport.onclick=()=>{openExport(); menuDrawer.classList.remove('open');};
 
-  // Inputs
-  [dayStart,dayEnd,dayBreak].forEach(el=>el.addEventListener('input',()=>{compute(); saveDayLocal();}));
+  // Inputs (input+blur)
+  [dayStart,dayEnd,dayBreak].forEach(el=>{
+    el.addEventListener('input',()=>{compute(); saveDayLocal();});
+    el.addEventListener('blur', ()=>{compute(); saveDayLocal();});
+  });
   dayDate.addEventListener('change',()=>{updateDayName(); loadDay(); saveDayLocal();});
 
   // Settings + month + export
