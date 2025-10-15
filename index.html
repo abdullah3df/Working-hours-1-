@@ -8,7 +8,7 @@
 :root{--bg:#f6f8fb;--card:#fff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6}
 .dark{--bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2b40;--ok:#16a34a;--warn:#ef4444;--accent:#60a5fa}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto Naskh Arabic",Tahoma,Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto Naskh Arabic","Cairo",Tahoma,Arial,sans-serif}
 
 /* === Topbar (منظّم للموبايل) === */
 .topbar{
@@ -290,6 +290,7 @@ authBtn.onclick = () => {
 onAuthStateChanged(auth, (user) => {
   const lang = getLang();
   if (!user) {
+    // حماية الصفحة
     window.location.href = "login.html";
   } else {
     const name = user.displayName || user.email || 'مستخدم';
@@ -385,13 +386,17 @@ function loadSettings(){const s=JSON.parse(localStorage.getItem('settings')||'{}
 function saveSettings(){const s={daily:parseFloat(stDaily.value||8),break:parseInt(stBreak.value||30,10)}; localStorage.setItem('settings',JSON.stringify(s)); dBase.textContent=String(s.daily); notifySaved();}
 
 /* Day */
-function updateDayName(){const lang=getLang(); if(!dayDate.value){try{dayDate.valueAsDate=new Date();}catch{dayDate.value=new Date().toISOString().slice(0,10);} } try{dayName.textContent=dayNameIntl(new Date(dayDate.value),lang);}catch{dayName.textContent='—';}}
+function updateDayName(){
+  const lang=getLang();
+  if(!dayDate.value){try{dayDate.valueAsDate=new Date();}catch{dayDate.value=new Date().toISOString().slice(0,10);} }
+  try{dayName.textContent=dayNameIntl(new Date(dayDate.value),lang);}catch{dayName.textContent='—';}
+}
 function compute(){
   const base=Math.round(parseFloat(stDaily.value||8)*60);
   const s=dayStart.value,e=dayEnd.value,br=Math.max(0, parseInt(dayBreak.value||0,10) || 0);
   if(!s||!e){dNet.textContent='0:00'; dOT.textContent='0:00'; return;}
   let sm=h2m(s), em=h2m(e);
-  if(em<sm) em+=1440; // دعم عبور منتصف الليل كما في النسخة الأصلية
+  if(em<sm) em+=1440; // دعم عبور منتصف الليل
   const net=Math.max(0,(em-sm)-br);
   const ot=Math.max(0,net-base);
   dNet.textContent=m2h(net); dOT.textContent=m2h(ot); dBase.textContent=String(stDaily.value||8);
@@ -410,12 +415,77 @@ function buildMonthTableHead(lang){const L=I18N[lang]; const thead=monthArea.que
 function openMonth(){if(!monthPick.value){monthPick.value=dayDate.value.slice(0,7);} monthModal.classList.add('open'); monthModal.setAttribute('aria-hidden','false'); refreshMonthSummary();}
 function refreshMonthSummary(){const month=monthPick.value||dayDate.value.slice(0,7); const [y,mo]=month.split('-').map(Number); const first=new Date(y,mo-1,1), last=new Date(y,mo,0); const baseDay=Math.round(parseFloat(stDaily.value||8)*60); const rows=[]; let total=0, daysCount=0; for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){const key='day-'+d.toISOString().slice(0,10); const raw=localStorage.getItem(key); if(!raw) continue; try{const p=JSON.parse(raw); if(p.start&&p.end){let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-parseInt(p.break||0,10)); const ot=Math.max(0,net-baseDay); rows.push([key.slice(4),p.start,p.end,p.break||0,m2h(net),m2h(ot)]); total+=net; daysCount++; }}catch{}} rows.sort((a,b)=>a[0]<b[0]?-1:1); const lang=getLang(); const L=I18N[lang]; let html=`<table class="table"><thead></thead><tbody>`; rows.forEach(r=> html+=`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`); html+='</tbody></table>'; monthArea.innerHTML=html; monthArea.dataset.built='1'; buildMonthTableHead(lang); mTotal.textContent=m2h(total); mDays.textContent=String(daysCount); mAvg.textContent=daysCount?m2h(Math.round(total/daysCount)):'0:00';}
 
+/* Locale helper لاختيار لغة الطابع الزمني في التصدير */
+function getLocaleFromLang(lang){ return lang==='ar' ? 'ar-EG' : (lang==='de' ? 'de-DE' : 'en-GB'); }
+
 /* Export (PNG/JSON) */
-async function nodeToPNGAndDownload(node,filename){if(typeof html2canvas==='undefined'){alert('Image export unavailable.');return;} document.body.appendChild(node); const canvas=await html2canvas(node,{scale:2,backgroundColor:'#ffffff'}); const dataURL=canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=dataURL; a.download=filename.endsWith('.png')?filename:`${filename}.png`; a.click(); node.remove();}
-function exportDayPNG(){const lang=getLang(); const L=I18N[lang]; const node=document.createElement('div'); node.dir=L.dir; node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff;'; node.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h2 style="margin:0">${L.day.title}</h2><div>${new Date().toLocaleString()}</div></div><div style="margin:6px 0">${L.day.date}: <strong>${dayDate.value}</strong></div><div style="margin:6px 0">${L.day.start.replace('🟢 ','')}: <strong>${dayStart.value||'-'}</strong> — ${L.day.end.replace('🔴 ','')}: <strong>${dayEnd.value||'-'}</strong> — ${L.day.break.replace('☕️ ','')}: <strong>${dayBreak.value||0}</strong></div><div style="margin:6px 0">${L.day.k1}: <strong>${dNet.textContent}</strong> — ${L.day.k2}: <strong>${dOT.textContent}</strong> — ${L.settings.daily}: <strong>${stDaily.value}</strong></div>`; nodeToPNGAndDownload(node,`day-${dayDate.value}.png`);}
-function exportMonthPNG(){refreshMonthSummary(); const lang=getLang(); const L=I18N[lang]; const month=monthPick.value||dayDate.value.slice(0,7); const node=document.createElement('div'); node.dir=L.dir; node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff; width:700px;'; node.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h2 style="margin:0">${L.month.title}</h2><div>${new Date().toLocaleString()}</div></div><div style="margin-bottom:8px;font-weight:700">${month}</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center"><div style="color:#475569;font-size:13px">${L.month.m1}</div><div style="font-size:20px;font-weight:800">${mTotal.textContent}</div></div><div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center"><div style="color:#475569;font-size:13px">${L.month.m2}</div><div style="font-size:20px;font-weight:800">${mDays.textContent}</div></div><div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center"><div style="color:#475569;font-size:13px">${L.month.m3}</div><div style="font-size:20px;font-weight:800">${mAvg.textContent}</div></div></div>`; nodeToPNGAndDownload(node,`month-${month}.png`);}
-function exportDayJSON(){const lang=getLang(); const data={meta:{scope:'day',lang,date:dayDate.value,exportedAt:new Date().toISOString()},payload:{date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`day-${dayDate.value}.json`; a.click(); URL.revokeObjectURL(url);}
-function exportMonthJSON(){refreshMonthSummary(); const month=monthPick.value||dayDate.value.slice(0,7); const rows=[...monthArea.querySelectorAll('tbody tr')].map(tr=>[...tr.children].map(td=>td.textContent.trim())); const data={meta:{scope:'month',month,exportedAt:new Date().toISOString()},rows,totals:{total:mTotal.textContent,days:mDays.textContent,avg:mAvg.textContent}}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`month-${month}.json`; a.click(); URL.revokeObjectURL(url);}
+async function nodeToPNGAndDownload(node,filename){
+  if(typeof html2canvas==='undefined'){alert('Image export unavailable.');return;}
+  document.body.appendChild(node);
+  const canvas=await html2canvas(node,{scale:2,backgroundColor:'#ffffff'});
+  const dataURL=canvas.toDataURL('image/png');
+  const a=document.createElement('a'); a.href=dataURL; a.download=filename.endsWith('.png')?filename:`${filename}.png`; a.click();
+  node.remove();
+}
+function exportDayPNG(){
+  const lang=getLang(); const L=I18N[lang]; const loc=getLocaleFromLang(lang);
+  const node=document.createElement('div');
+  node.lang=lang; node.dir=L.dir;
+  node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff;';
+  node.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h2 style="margin:0">${L.day.title}</h2><div>${new Date().toLocaleString(loc)}</div>
+    </div>
+    <div style="margin:6px 0">${L.day.date}: <strong>${dayDate.value}</strong></div>
+    <div style="margin:6px 0">${L.day.start.replace('🟢 ','')}: <strong>${dayStart.value||'-'}</strong>
+      — ${L.day.end.replace('🔴 ','')}: <strong>${dayEnd.value||'-'}</strong>
+      — ${L.day.break.replace('☕️ ','')}: <strong>${dayBreak.value||0}</strong>
+    </div>
+    <div style="margin:6px 0">${L.day.k1}: <strong>${dNet.textContent}</strong>
+      — ${L.day.k2}: <strong>${dOT.textContent}</strong>
+      — ${L.settings.daily}: <strong>${stDaily.value}</strong></div>`;
+  nodeToPNGAndDownload(node,`day-${dayDate.value}.png`);
+}
+function exportMonthPNG(){
+  refreshMonthSummary();
+  const lang=getLang(); const L=I18N[lang]; const loc=getLocaleFromLang(lang);
+  const month=monthPick.value||dayDate.value.slice(0,7);
+  const node=document.createElement('div');
+  node.lang=lang; node.dir=L.dir;
+  node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff; width:700px;';
+  node.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h2 style="margin:0">${L.month.title}</h2><div>${new Date().toLocaleString(loc)}</div>
+    </div>
+    <div style="margin-bottom:8px;font-weight:700">${month}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center">
+        <div style="color:#475569;font-size:13px">${L.month.m1}</div>
+        <div style="font-size:20px;font-weight:800">${mTotal.textContent}</div>
+      </div>
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center">
+        <div style="color:#475569;font-size:13px">${L.month.m2}</div>
+        <div style="font-size:20px;font-weight:800">${mDays.textContent}</div>
+      </div>
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center">
+        <div style="color:#475569;font-size:13px">${L.month.m3}</div>
+        <div style="font-size:20px;font-weight:800">${mAvg.textContent}</div>
+      </div>
+    </div>`;
+  nodeToPNGAndDownload(node,`month-${month}.png`);
+}
+function exportDayJSON(){
+  const lang=getLang();
+  const data={meta:{scope:'day',lang,date:dayDate.value,exportedAt:new Date().toISOString()},payload:{date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`day-${dayDate.value}.json`; a.click(); URL.revokeObjectURL(url);
+}
+function exportMonthJSON(){
+  refreshMonthSummary();
+  const month=monthPick.value||dayDate.value.slice(0,7);
+  const rows=[...monthArea.querySelectorAll('tbody tr')].map(tr=>[...tr.children].map(td=>td.textContent.trim()));
+  const data={meta:{scope:'month',month,exportedAt:new Date().toISOString()},rows,totals:{total:mTotal.textContent,days:mDays.textContent,avg:mAvg.textContent}};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`month-${month}.json`; a.click(); URL.revokeObjectURL(url);
+}
 
 /* لغة */
 function setLang(lang){
