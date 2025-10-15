@@ -10,7 +10,7 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto Naskh Arabic","Cairo",Tahoma,Arial,sans-serif}
 
-/* === Topbar (منظّم للموبايل) === */
+/* Topbar */
 .topbar{position:sticky;top:0;z-index:60;background:color-mix(in srgb, var(--card) 92%, transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .dark .topbar{background:#0c1426cc}
 .topbar .inner{max-width:1060px;margin:0 auto;padding:8px 12px;display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;min-height:52px}
@@ -23,7 +23,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto 
 .btn-flag{width:36px;height:36px;padding:0;font-size:18px;border-radius:10px;flex:0 0 36px}
 .btn-flag.active{outline:2px solid var(--accent)}
 
-/* Drawer menu */
+/* Drawer */
 .menu-drawer{position:fixed; top:52px; bottom:0; left:0; width:280px;background:var(--card); border-inline-start:1px solid var(--line);box-shadow:0 12px 28px rgba(15,23,42,.18);transform:translateX(-100%); transition:transform .25s ease; z-index:55}
 .menu-drawer.open{transform:translateX(0)}
 [dir="rtl"] .menu-drawer{left:auto; right:0; transform:translateX(100%)}
@@ -31,7 +31,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto 
 .menu-list{display:flex;flex-direction:column;gap:8px;padding:12px}
 .menu-list .btn-sm{width:100%}
 
-/* Layout cards */
+/* Layout */
 .wrap{max-width:860px;margin:16px auto;padding:12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 8px 26px rgba(15,23,42,.06)}
 h1{margin:0 0 8px;font-size:22px}
@@ -42,7 +42,7 @@ p.small{color:var(--muted);margin:0 0 12px}
 .date-input label{display:block;color:var(--muted);font-size:13px;margin:0 0 4px}
 .date-input input{width:100%;height:46px;padding:10px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#0f172a;direction:ltr;text-align:center;font-weight:700;font-size:16px}
 .dark .date-input input{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
-.pill{align-self:end;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:#0f172a;font-size:13px;font-weight:700;min-width:auto;text-align:center}
+.pill{align-self:end;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:#0f172a;font-size:13px;font-weight:700;text-align:center}
 .dark .pill{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
 
 /* Time grid */
@@ -80,7 +80,7 @@ tbody tr{background:#fff;border:1px solid var(--line)}
 tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
 tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 
-/* تحسينات موبايل */
+/* Mobile tweaks */
 @media (max-width:720px){.topbar .inner{grid-template-columns:auto 1fr; row-gap:6px}.top-actions{grid-column:1 / -1; justify-content:flex-end; overflow:auto}.lang-flags{max-width:100%}}
 @media (max-width:420px){.btn-sm{height:34px;padding:4px 8px;font-size:14px}.btn-flag{width:32px;height:32px;font-size:16px}.date-input input,.time-box input{height:44px;font-size:15px}.wrap{padding:10px}}
 </style>
@@ -105,7 +105,7 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   </div>
 </div>
 
-<!-- Drawer Menu -->
+<!-- Drawer -->
 <div id="menuDrawer" class="menu-drawer" aria-hidden="true">
   <div class="menu-list" role="menu">
     <button id="mnuDay" class="btn-sm">اليوم</button>
@@ -218,9 +218,8 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 <!-- html2canvas -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
 
-<!-- Firebase (Auth فقط) + التطبيق -->
+<!-- Firebase + App -->
 <script type="module">
-/* ================= Firebase Auth Guard ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
@@ -257,7 +256,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-/* ================= I18N ================= */
+/* I18N */
 const I18N = {
   ar:{dir:'rtl',brand:'ساعتي',nav:{menu:'القائمة',day:'اليوم',month:'الشهري',settings:'الإعدادات',export:'تصدير'},themeLight:'داكن',themeDark:'فاتح',day:{title:'الإدخال اليومي',hint:'أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.',date:'تاريخ',start:'🟢 دخول',end:'🔴 خروج',break:'☕️ استراحة (دقيقة)',k1:'صافي اليوم',k2:'إضافي اليوم',k3:'أساس اليوم (س)',k4:'حالة الحفظ',saved:'تم الحفظ تلقائيًا ✅'},settings:{title:'الإعدادات',hint:'اضبط القيم الافتراضية.',daily:'أساس اليوم (ساعات)',brdef:'استراحة افتراضية (دقيقة)',apply:'حفظ'},month:{title:'ملخص شهري',pick:'اختر الشهر',m1:'مجموع الشهر',m2:'أيام مسجلة',m3:'معدل اليوم',close:'إغلاق',refresh:'تحديث',thead:['التاريخ','البداية','النهاية','استراحة','الصافي','إضافي']},export:{title:'تصدير',scope:'النطاق',format:'الصيغة',optDay:'اليوم الحالي',optMonth:'الشهر المختار',png:'صورة (PNG)',json:'JSON',cancel:'إلغاء',do:'تصدير'}},
   en:{dir:'ltr',brand:'Saaati',nav:{menu:'Menu',day:'Day',month:'Monthly',settings:'Settings',export:'Export'},themeLight:'Dark',themeDark:'Light',day:{title:'Daily Entry',hint:'Enter start, end and break. Autosaved locally.',date:'Date',start:'🟢 Clock In',end:'🔴 Clock Out',break:'☕️ Break (min)',k1:'Net Today',k2:'Overtime',k3:'Daily Base (h)',k4:'Save Status',saved:'Auto-saved ✅'},settings:{title:'Settings',hint:'Adjust defaults.',daily:'Daily Base (hours)',brdef:'Default Break (min)',apply:'Save'},month:{title:'Monthly Summary',pick:'Pick month',m1:'Month Total',m2:'Logged Days',m3:'Avg/Day',close:'Close',refresh:'Refresh',thead:['Date','Start','End','Break','Net','OT']},export:{title:'Export',scope:'Scope',format:'Format',optDay:'Current Day',optMonth:'Selected Month',png:'Image (PNG)',json:'JSON',cancel:'Cancel',do:'Export'}},
@@ -266,70 +265,17 @@ const I18N = {
 const LS_LANG='saaati_lang';
 let currentLang = localStorage.getItem(LS_LANG) || (navigator.language?.startsWith('ar')?'ar':navigator.language?.startsWith('de')?'de':'en');
 function getLang(){return currentLang;}
-function getUILang(){ return document.documentElement.lang || currentLang || 'ar'; }    /* ← NEW */
 function setActiveLangUI(lang){document.querySelectorAll('.btn-flag').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));}
 
-/* Refs */
-const themeBtn=document.getElementById('themeBtn');
-const menuToggle=document.getElementById('menuToggle');
-const menuDrawer=document.getElementById('menuDrawer');
-const mnuDay=document.getElementById('mnuDay');
-const mnuMonth=document.getElementById('mnuMonth');
-const mnuSettings=document.getElementById('mnuSettings');
-const mnuExport=document.getElementById('mnuExport');
-
-const brandTxt=document.getElementById('brandTxt');
-const dayCard=document.getElementById('dayCard');
-const settingsCard=document.getElementById('settingsCard');
-
-const titleDay=document.getElementById('titleDay');
-const hintDay=document.getElementById('hintDay');
-const lblDate=document.getElementById('lblDate');
-const lblStart=document.getElementById('lblStart');
-const lblEnd=document.getElementById('lblEnd');
-const lblBreak=document.getElementById('lblBreak');
-const k1=document.getElementById('k1');
-const k2=document.getElementById('k2');
-const k3=document.getElementById('k3');
-const k4=document.getElementById('k4');
-
-const titleSettings=document.getElementById('titleSettings');
-const hintSettings=document.getElementById('hintSettings');
-const lblDaily=document.getElementById('lblDaily');
-const lblBreakDef=document.getElementById('lblBreakDef');
-const applySettings=document.getElementById('applySettings');
-
-const titleMonth=document.getElementById('titleMonth');
-const lblPickMonth=document.getElementById('lblPickMonth');
-const refreshMonth=document.getElementById('refreshMonth');
-const closeMonth=document.getElementById('closeMonth');
-const monthModal=document.getElementById('monthModal');
-const monthPick=document.getElementById('monthPick');
-const monthArea=document.getElementById('monthArea');
-const mTotal=document.getElementById('mTotal');
-const mDays=document.getElementById('mDays');
-const mAvg=document.getElementById('mAvg');
-
-const titleExport=document.getElementById('titleExport');
-const lblScope=document.getElementById('lblScope');
-const lblFormat=document.getElementById('lblFormat');
-const exportModal=document.getElementById('exportModal');
-const expScope=document.getElementById('expScope');
-const expFormat=document.getElementById('expFormat');
-const closeExport=document.getElementById('closeExport');
-const doExport=document.getElementById('doExport');
-
-const dayDate=document.getElementById('dayDate');
-const dayStart=document.getElementById('dayStart');
-const dayEnd=document.getElementById('dayEnd');
-const dayBreak=document.getElementById('dayBreak');
-const dNet=document.getElementById('dNet');
-const dOT=document.getElementById('dOT');
-const dBase=document.getElementById('dBase');
-const dSave=document.getElementById('dSave');
-const dayName=document.getElementById('dayName');
-const stDaily=document.getElementById('stDaily');
-const stBreak=document.getElementById('stBreak');
+/* DOM refs (مختصر) */
+const themeBtn=document.getElementById('themeBtn'); const menuToggle=document.getElementById('menuToggle'); const menuDrawer=document.getElementById('menuDrawer');
+const mnuDay=document.getElementById('mnuDay'); const mnuMonth=document.getElementById('mnuMonth'); const mnuSettings=document.getElementById('mnuSettings'); const mnuExport=document.getElementById('mnuExport');
+const brandTxt=document.getElementById('brandTxt'); const dayCard=document.getElementById('dayCard'); const settingsCard=document.getElementById('settingsCard');
+const titleDay=document.getElementById('titleDay'); const hintDay=document.getElementById('hintDay'); const lblDate=document.getElementById('lblDate'); const lblStart=document.getElementById('lblStart'); const lblEnd=document.getElementById('lblEnd'); const lblBreak=document.getElementById('lblBreak'); const k1=document.getElementById('k1'); const k2=document.getElementById('k2'); const k3=document.getElementById('k3'); const k4=document.getElementById('k4');
+const titleSettings=document.getElementById('titleSettings'); const hintSettings=document.getElementById('hintSettings'); const lblDaily=document.getElementById('lblDaily'); const lblBreakDef=document.getElementById('lblBreakDef'); const applySettings=document.getElementById('applySettings');
+const titleMonth=document.getElementById('titleMonth'); const lblPickMonth=document.getElementById('lblPickMonth'); const refreshMonth=document.getElementById('refreshMonth'); const closeMonth=document.getElementById('closeMonth'); const monthModal=document.getElementById('monthModal'); const monthPick=document.getElementById('monthPick'); const monthArea=document.getElementById('monthArea'); const mTotal=document.getElementById('mTotal'); const mDays=document.getElementById('mDays'); const mAvg=document.getElementById('mAvg');
+const titleExport=document.getElementById('titleExport'); const lblScope=document.getElementById('lblScope'); const lblFormat=document.getElementById('lblFormat'); const exportModal=document.getElementById('exportModal'); const expScope=document.getElementById('expScope'); const expFormat=document.getElementById('expFormat'); const closeExport=document.getElementById('closeExport'); const doExport=document.getElementById('doExport');
+const dayDate=document.getElementById('dayDate'); const dayStart=document.getElementById('dayStart'); const dayEnd=document.getElementById('dayEnd'); const dayBreak=document.getElementById('dayBreak'); const dNet=document.getElementById('dNet'); const dOT=document.getElementById('dOT'); const dBase=document.getElementById('dBase'); const dSave=document.getElementById('dSave'); const dayName=document.getElementById('dayName'); const stDaily=document.getElementById('stDaily'); const stBreak=document.getElementById('stBreak');
 
 /* Theme */
 function setThemeLabel(){const L=I18N[getLang()]; themeBtn.textContent=(document.body.classList.contains('dark')?L.themeDark:L.themeLight);}
@@ -340,14 +286,18 @@ function h2m(h){if(!h)return 0; const [H,M]=h.split(':').map(Number); return H*6
 function m2h(m){m=Math.max(0,Math.floor(m)); const hh=Math.floor(m/60), mm=m%60; return `${hh}:${String(mm).padStart(2,'0')}`;}
 function dayNameIntl(date,lang){try{const fmt=new Intl.DateTimeFormat(lang==='ar'?'ar-EG':lang==='de'?'de-DE':'en-GB',{weekday:'long'}); return fmt.format(date);}catch{return['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][date.getDay()];}}
 
-/* Locale helpers (للتصدير) */
-function getLocaleFromLang(lang){ return lang==='ar'?'ar-EG':(lang==='de'?'de-DE':'en-GB'); }   /* ← NEW */
-function formatNow(lang){                                                                              /* ← NEW */
-  const loc=getLocaleFromLang(lang);
-  try{
-    return new Intl.DateTimeFormat(loc,{dateStyle:'medium',timeStyle:'medium',hour12:false,numberingSystem:'latn'}).format(new Date());
-  }catch{ return new Date().toLocaleString(loc); }
+/* ---------- NEW: لغـة التصدير وطابع زمني ثابت ---------- */
+// احصل على اللغة الفعلية من العلم النشط أو html[lang] أو currentLang
+function resolveLang(){
+  const active = document.querySelector('.btn-flag.active');
+  return (active && active.dataset.lang) || document.documentElement.lang || currentLang || 'ar';
 }
+// طابع زمني ثابت بأرقام لاتينية (YYYY-MM-DD HH:mm:ss)
+function tsNow(){
+  const d=new Date(); const pad=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+/* ------------------------------------------------------- */
 
 /* Settings */
 function loadSettings(){const s=JSON.parse(localStorage.getItem('settings')||'{}'); stDaily.value=s.daily??8; stBreak.value=s.break??30; dBase.textContent=String(stDaily.value);}
@@ -360,21 +310,21 @@ function notifySaved(){const lang=getLang(); dSave.textContent=I18N[lang].day.sa
 function saveDayLocal(){const p={date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}; localStorage.setItem('day-'+p.date,JSON.stringify(p)); notifySaved();}
 function loadDay(){const raw=localStorage.getItem('day-'+dayDate.value); if(raw){try{const p=JSON.parse(raw); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=p.break??(stBreak.value||30);}catch{dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30;}} else { dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30; } compute();}
 
-/* Month */
+/* Month (على الشاشة) */
 function buildMonthTableHead(lang){const L=I18N[lang]; const thead=monthArea.querySelector('thead'); if(thead){thead.innerHTML=`<tr>${L.month.thead.map(h=>`<th>${h}</th>`).join('')}</tr>`;}}
 function openMonth(){if(!monthPick.value){monthPick.value=dayDate.value.slice(0,7);} monthModal.classList.add('open'); monthModal.setAttribute('aria-hidden','false'); refreshMonthSummary();}
 function refreshMonthSummary(){const month=monthPick.value||dayDate.value.slice(0,7); const [y,mo]=month.split('-').map(Number); const first=new Date(y,mo-1,1), last=new Date(y,mo,0); const baseDay=Math.round(parseFloat(stDaily.value||8)*60); const rows=[]; let total=0, daysCount=0; for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){const key='day-'+d.toISOString().slice(0,10); const raw=localStorage.getItem(key); if(!raw) continue; try{const p=JSON.parse(raw); if(p.start&&p.end){let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-parseInt(p.break||0,10)); const ot=Math.max(0,net-baseDay); rows.push([key.slice(4),p.start,p.end,p.break||0,m2h(net),m2h(ot)]); total+=net; daysCount++; }}catch{}} rows.sort((a,b)=>a[0]<b[0]?-1:1); const lang=getLang(); const L=I18N[lang]; let html=`<table class="table"><thead></thead><tbody>`; rows.forEach(r=> html+=`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`); html+='</tbody></table>'; monthArea.innerHTML=html; monthArea.dataset.built='1'; buildMonthTableHead(lang); mTotal.textContent=m2h(total); mDays.textContent=String(daysCount); mAvg.textContent=daysCount?m2h(Math.round(total/daysCount)):'0:00';}
 
-/* ===== Export helpers ===== */
+/* ---------- Export helpers ---------- */
 async function nodeToPNGAndDownload(node,filename){if(typeof html2canvas==='undefined'){alert('Image export unavailable.');return;} document.body.appendChild(node); const canvas=await html2canvas(node,{scale:2,backgroundColor:'#ffffff'}); const dataURL=canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=dataURL; a.download=filename.endsWith('.png')?filename:`${filename}.png`; a.click(); node.remove();}
 
-/* Export (PNG/JSON) — يَستخدم لغة الواجهة الحالية دائمًا */
+/* Export (PNG/JSON) — يعتمد دائمًا على resolveLang + tsNow */
 function exportDayPNG(){
-  const lang=getUILang(); const L=I18N[lang];
+  const lang = resolveLang(); const L=I18N[lang];
   const node=document.createElement('div'); node.lang=lang; node.dir=L.dir;
   node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff;';
   node.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <h2 style="margin:0">${L.day.title}</h2><div>${formatNow(lang)}</div>
+      <h2 style="margin:0">${L.day.title}</h2><div>${tsNow()}</div>
     </div>
     <div style="margin:6px 0">${L.day.date}: <strong>${dayDate.value}</strong></div>
     <div style="margin:6px 0">${L.day.start.replace('🟢 ','')}: <strong>${dayStart.value||'-'}</strong>
@@ -388,7 +338,6 @@ function exportDayPNG(){
 }
 
 function exportMonthPNG(){
-  // أعِد بناء البيانات محليًا ثم صدّر
   const month=monthPick.value||dayDate.value.slice(0,7);
   const [y,mo]=month.split('-').map(Number);
   const first=new Date(y,mo-1,1), last=new Date(y,mo,0);
@@ -407,12 +356,12 @@ function exportMonthPNG(){
   }
   rows.sort((a,b)=>a[0]<b[0]?-1:1);
 
-  const lang=getUILang(); const L=I18N[lang];
+  const lang=resolveLang(); const L=I18N[lang];
   const node=document.createElement('div'); node.lang=lang; node.dir=L.dir;
   node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff; width:700px;';
 
   let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <h2 style="margin:0">${L.month.title}</h2><div>${formatNow(lang)}</div>
+      <h2 style="margin:0">${L.month.title}</h2><div>${tsNow()}</div>
     </div>
     <div style="margin-bottom:8px;font-weight:700">${month}</div>
     <table style="width:100%;border-collapse:separate;border-spacing:0 8px">
@@ -441,7 +390,7 @@ function exportMonthPNG(){
   nodeToPNGAndDownload(node,`month-${month}.png`);
 }
 
-function exportDayJSON(){const lang=getUILang(); const data={meta:{scope:'day',lang,date:dayDate.value,exportedAt:new Date().toISOString()},payload:{date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`day-${dayDate.value}.json`; a.click(); URL.revokeObjectURL(url);}
+function exportDayJSON(){const lang=resolveLang(); const data={meta:{scope:'day',lang,date:dayDate.value,exportedAt:new Date().toISOString()},payload:{date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`day-${dayDate.value}.json`; a.click(); URL.revokeObjectURL(url);}
 function exportMonthJSON(){refreshMonthSummary(); const month=monthPick.value||dayDate.value.slice(0,7); const rows=[...monthArea.querySelectorAll('tbody tr')].map(tr=>[...tr.children].map(td=>td.textContent.trim())); const data={meta:{scope:'month',month,exportedAt:new Date().toISOString()},rows,totals:{total:mTotal.textContent,days:mDays.textContent,avg:mAvg.textContent}}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`month-${month}.json`; a.click(); URL.revokeObjectURL(url);}
 
 /* لغة */
@@ -451,7 +400,7 @@ function setLang(lang){
   document.documentElement.lang=lang; document.documentElement.dir=L.dir; document.body.dir=L.dir;
   brandTxt.textContent=L.brand;
   themeBtn.textContent=(document.body.classList.contains('dark')?L.themeDark:L.themeLight);
-  menuToggle.textContent=L.nav.menu; mnuDay.textContent=L.nav.day; mnuMonth.textContent=L.nav.month; mnuSettings.textContent=L.nav.settings; mnuExport.textContent=L.nav.export;
+  mnuDay.textContent=L.nav.day; mnuMonth.textContent=L.nav.month; mnuSettings.textContent=L.nav.settings; mnuExport.textContent=L.nav.export; menuToggle.textContent=L.nav.menu;
   authBtn.textContent=(auth.currentUser?(lang==='de'?'Abmelden':lang==='en'?'Sign out':'تسجيل الخروج'):(lang==='de'?'Anmelden':lang==='en'?'Sign in':'تسجيل'));
   titleDay.textContent=L.day.title; hintDay.textContent=L.day.hint; lblDate.textContent=L.day.date; lblStart.textContent=L.day.start; lblEnd.textContent=L.day.end; lblBreak.textContent=L.day.break; k1.textContent=L.day.k1; k2.textContent=L.day.k2; k3.textContent=L.day.k3; k4.textContent=L.day.k4;
   titleSettings.textContent=L.settings.title; hintSettings.textContent=L.settings.hint; lblDaily.textContent=L.settings.daily; lblBreakDef.textContent=L.settings.brdef; applySettings.textContent=L.settings.apply;
@@ -463,7 +412,7 @@ function setLang(lang){
   setActiveLangUI(lang);
 }
 
-/* تنقل + تهيئة */
+/* Nav + Init */
 function showCard(card){[dayCard,settingsCard].forEach(el=>el.style.display='none'); card.style.display='block';}
 function openExport(){exportModal.classList.add('open'); exportModal.setAttribute('aria-hidden','false');}
 
