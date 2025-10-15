@@ -10,17 +10,36 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto Naskh Arabic",Tahoma,Arial,sans-serif}
 
-/* Topbar */
-.topbar{position:sticky;top:0;z-index:60;background:#ffffffcc;backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+/* === Topbar (منظّم للموبايل) === */
+.topbar{
+  position:sticky;top:0;z-index:60;
+  background:color-mix(in srgb, var(--card) 92%, transparent);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line)
+}
 .dark .topbar{background:#0c1426cc}
-.topbar .inner{max-width:1060px;margin:0 auto;padding:10px 12px;display:flex;align-items:center;gap:8px}
+.topbar .inner{
+  max-width:1060px;margin:0 auto;
+  padding:8px 12px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:8px; align-items:center;
+  min-height:52px;
+}
 .brand{font-weight:800;display:flex;align-items:center;gap:6px;white-space:nowrap}
-.btn-sm{padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;height:36px}
-.spacer{flex:1}
-.lang-flags{display:flex;gap:6px;align-items:center}
-.btn-flag{width:36px;height:36px;padding:0;font-size:18px;border-radius:10px}
+.btn-sm{
+  height:36px;padding:6px 10px;border-radius:10px;
+  border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer
+}
+.user-pill{
+  padding:6px 10px;border-radius:999px;border:1px solid var(--line);
+  background:var(--card);white-space:nowrap;max-width:32ch;overflow:hidden;text-overflow:ellipsis
+}
+.top-actions{display:flex;gap:6px;align-items:center}
+.lang-flags{display:flex;gap:6px;align-items:center;overflow:auto;max-width:42vw}
+.lang-flags::-webkit-scrollbar{display:none}
+.btn-flag{width:36px;height:36px;padding:0;font-size:18px;border-radius:10px;flex:0 0 36px}
 .btn-flag.active{outline:2px solid var(--accent)}
-.user-pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);white-space:nowrap;max-width:40ch;overflow:hidden;text-overflow:ellipsis}
 
 /* Drawer menu */
 .menu-drawer{
@@ -36,27 +55,34 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto 
 .menu-list .btn-sm{width:100%}
 
 /* Layout cards */
-.wrap{max-width:860px;margin:24px auto;padding:16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 8px 26px rgba(15,23,42,.06)}
+.wrap{max-width:860px;margin:16px auto;padding:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 8px 26px rgba(15,23,42,.06)}
 h1{margin:0 0 8px;font-size:22px}
 p.small{color:var(--muted);margin:0 0 12px}
 
 /* Date row */
 .date-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-bottom:8px}
 .date-input label{display:block;color:var(--muted);font-size:13px;margin:0 0 4px}
-.date-input input{width:100%;height:44px;padding:10px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#0f172a;direction:ltr;text-align:center;font-weight:700}
+.date-input input{
+  width:100%;height:46px;padding:10px;border-radius:12px;border:1px solid var(--line);
+  background:#fff;color:#0f172a;direction:ltr;text-align:center;font-weight:700;font-size:16px
+}
 .dark .date-input input{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
-.pill{align-self:end;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;color:#0f172a;font-size:13px;font-weight:700;min-width:110px;text-align:center}
+.pill{align-self:end;padding:8px 12px;border-radius:999px;border:1px solid var(--line);
+  background:#fff;color:#0f172a;font-size:13px;font-weight:700;min-width:auto;text-align:center}
 .dark .pill{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
 
 /* Time grid */
-.time-grid{display:grid;grid-template-columns:1fr 1fr 130px;gap:12px}
-@media (max-width:560px){.time-grid{grid-template-columns:1fr 1fr}.break-col{grid-column:span 2;justify-self:end;max-width:200px;width:100%}}
-.time-box{border:1px solid var(--line);background:#fff;border-radius:16px;padding:12px}
+.time-grid{display:grid;grid-template-columns:1fr 1fr 140px;gap:10px}
+@media (max-width:560px){.time-grid{grid-template-columns:1fr 1fr}.break-col{grid-column:1 / -1}}
+.time-box{border:1px solid var(--line);background:#fff;border-radius:16px;padding:10px}
 .dark .time-box{background:#0e1528;border-color:#1f2b40}
 .time-box .title{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px}
 .start .title{color:var(--ok)} .end .title{color:var(--warn)}
-.time-box input{width:100%;height:44px;padding:10px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#0f172a;direction:ltr;text-align:center;font-weight:700}
+.time-box input{
+  width:100%;height:46px;padding:10px;border-radius:12px;border:1px solid var(--line);
+  background:#fff;color:#0f172a;direction:ltr;text-align:center;font-weight:700;font-size:16px
+}
 .dark .time-box input{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
 .start input{border-color:#86efac;background:#ecfdf5}
 .end input{border-color:#fecaca;background:#fef2f2}
@@ -64,7 +90,7 @@ p.small{color:var(--muted);margin:0 0 12px}
 .dark .end input{border-color:#7f1d1d;background:rgba(239,68,68,.08)}
 
 /* KPI */
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
 .kcard{border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;text-align:center}
 .dark .kcard{background:#0a1222;border-color:#1f2b40;color:#e5e7eb}
 .kcard h3{margin:0;color:var(--muted);font-size:13px}
@@ -83,6 +109,19 @@ tbody tr{background:#fff;border:1px solid var(--line)}
 .dark tbody tr{background:#0a1222;border-color:#1f2b40}
 tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
 tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
+
+/* تحسينات موبايل أوسع */
+@media (max-width:720px){
+  .topbar .inner{grid-template-columns:auto 1fr; row-gap:6px}
+  .top-actions{grid-column:1 / -1; justify-content:flex-end; overflow:auto}
+  .lang-flags{max-width:100%}
+}
+@media (max-width:420px){
+  .btn-sm{height:34px;padding:4px 8px;font-size:14px}
+  .btn-flag{width:32px;height:32px;font-size:16px}
+  .date-input input,.time-box input{height:44px;font-size:15px}
+  .wrap{padding:10px}
+}
 </style>
 </head>
 <body>
@@ -92,15 +131,18 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   <div class="inner">
     <button id="menuToggle" class="btn-sm" aria-expanded="false">☰ القائمة</button>
     <div class="brand">⏱️ <span id="brandTxt">ساعتي</span></div>
-    <div id="userPill" class="user-pill">غير مسجل</div>
-    <div class="spacer"></div>
-    <div class="lang-flags">
-      <button class="btn-sm btn-flag" data-lang="ar" title="العربية">🇸🇦</button>
-      <button class="btn-sm btn-flag" data-lang="en" title="English">🇬🇧</button>
-      <button class="btn-sm btn-flag" data-lang="de" title="Deutsch">🇩🇪</button>
+
+    <!-- مجموعة الأزرار اليمنى -->
+    <div class="top-actions">
+      <div id="userPill" class="user-pill">غير مسجل</div>
+      <div class="lang-flags">
+        <button class="btn-sm btn-flag" data-lang="ar" title="العربية">🇸🇦</button>
+        <button class="btn-sm btn-flag" data-lang="en" title="English">🇬🇧</button>
+        <button class="btn-sm btn-flag" data-lang="de" title="Deutsch">🇩🇪</button>
+      </div>
+      <button id="authBtn" class="btn-sm">تسجيل</button>
+      <button id="themeBtn" class="btn-sm">داكن</button>
     </div>
-    <button id="authBtn" class="btn-sm">تسجيل</button>
-    <button id="themeBtn" class="btn-sm">داكن</button>
   </div>
 </div>
 
@@ -131,11 +173,11 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
     <div class="time-grid">
       <div class="time-box start">
         <div class="title" id="lblStart">🟢 دخول</div>
-        <input id="dayStart" type="time" />
+        <input id="dayStart" type="time" step="60" inputmode="numeric" />
       </div>
       <div class="time-box end">
         <div class="title" id="lblEnd">🔴 خروج</div>
-        <input id="dayEnd" type="time" />
+        <input id="dayEnd" type="time" step="60" inputmode="numeric" />
       </div>
       <div class="time-box break-col">
         <div class="title" id="lblBreak">☕️ استراحة (دقيقة)</div>
@@ -246,21 +288,21 @@ authBtn.onclick = () => {
 };
 
 onAuthStateChanged(auth, (user) => {
+  const lang = getLang();
   if (!user) {
-    // حماية الصفحة
     window.location.href = "login.html";
   } else {
     const name = user.displayName || user.email || 'مستخدم';
     userPill.textContent = name;
-    authBtn.textContent = 'تسجيل الخروج';
+    authBtn.textContent = (lang==='de'?'Abmelden':lang==='en'?'Sign out':'تسجيل الخروج');
   }
 });
 
 /* ================= I18N ================= */
 const I18N = {
-  ar:{dir:'rtl',brand:'ساعتي',nav:{menu:'القائمة',day:'اليوم',month:'الشهري',settings:'الإعدادات',export:'تصدير'},themeLight:'داكن',themeDark:'فاتح',day:{title:'الإدخال اليومي',hint:'أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.',date:'تاريخ',start:'🟢 دخول',end:'🔴 خروج',break:'☕️ استراحة (دقيقة)',k1:'صافي اليوم',k2:'إضافي اليوم',k3:'أساس اليوم (س)',k4:'حالة الحفظ',saved:'تم الحفظ تلقائيًا ✅'},settings:{title:'الإعدادات',hint:'اضبط القيم الافتراضية.',daily:'أساس اليوم (ساعات)',brdef:'استراحة افتراضية (دقيقة)',apply:'حفظ'},month:{title:'ملخص شهري',pick:'اختر الشهر',m1:'مجموع الشهر',m2:'أيام مسجلة',m3:'معدل اليوم',close:'إغلاق',refresh:'تحديث',thead:['التاريخ','البداية','النهاية','استراحة','الصافي','إضافي']},export:{title:'تصدير',scope:'النطاق',format:'الصيغة',optDay:'اليوم الحالي',optMonth:'الشهر المختار',cancel:'إلغاء',do:'تصدير',png:'صورة (PNG)',json:'JSON'}},
-  en:{dir:'ltr',brand:'Saaati',nav:{menu:'Menu',day:'Day',month:'Monthly',settings:'Settings',export:'Export'},themeLight:'Dark',themeDark:'Light',day:{title:'Daily Entry',hint:'Enter start, end and break. Autosaved locally.',date:'Date',start:'🟢 Clock In',end:'🔴 Clock Out',break:'☕️ Break (min)',k1:'Net Today',k2:'Overtime',k3:'Daily Base (h)',k4:'Save Status',saved:'Auto-saved ✅'},settings:{title:'Settings',hint:'Adjust defaults.',daily:'Daily Base (hours)',brdef:'Default Break (min)',apply:'Save'},month:{title:'Monthly Summary',pick:'Pick month',m1:'Month Total',m2:'Logged Days',m3:'Avg/Day',close:'Close',refresh:'Refresh',thead:['Date','Start','End','Break','Net','OT']},export:{title:'Export',scope:'Scope',format:'Format',optDay:'Current Day',optMonth:'Selected Month',cancel:'Cancel',do:'Export',png:'Image (PNG)',json:'JSON'}},
-  de:{dir:'ltr',brand:'Meine Stunden',nav:{menu:'Menü',day:'Tag',month:'Monat',settings:'Einstellungen',export:'Export'},themeLight:'Dunkel',themeDark:'Hell',day:{title:'Tägliche Eingabe',hint:'Start, Ende und Pause. Lokal automatisch gespeichert.',date:'Datum',start:'🟢 Einchecken',end:'🔴 Auschecken',break:'☕️ Pause (Min.)',k1:'Netto heute',k2:'Überstunden',k3:'Tages-Soll (Std)',k4:'Speicherstatus',saved:'Automatisch gespeichert ✅'},settings:{title:'Einstellungen',hint:'Standardwerte anpassen.',daily:'Tages-Soll (Std.)',brdef:'Standardpause (Min.)',apply:'Speichern'},month:{title:'Monatsübersicht',pick:'Monat wählen',m1:'Monatssumme',m2:'Erfasste Tage',m3:'Schnitt/Tag',close:'Schließen',refresh:'Aktualisieren',thead:['Datum','Start','Ende','Pause','Netto','ÜSt']},export:{title:'Export',scope:'Bereich',format:'Format',optDay:'Heutiger Tag',optMonth:'Gewählter Monat',cancel:'Abbrechen',do:'Exportieren',png:'Bild (PNG)',json:'JSON'}}
+  ar:{dir:'rtl',brand:'ساعتي',nav:{menu:'القائمة',day:'اليوم',month:'الشهري',settings:'الإعدادات',export:'تصدير'},themeLight:'داكن',themeDark:'فاتح',day:{title:'الإدخال اليومي',hint:'أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.',date:'تاريخ',start:'🟢 دخول',end:'🔴 خروج',break:'☕️ استراحة (دقيقة)',k1:'صافي اليوم',k2:'إضافي اليوم',k3:'أساس اليوم (س)',k4:'حالة الحفظ',saved:'تم الحفظ تلقائيًا ✅'},settings:{title:'الإعدادات',hint:'اضبط القيم الافتراضية.',daily:'أساس اليوم (ساعات)',brdef:'استراحة افتراضية (دقيقة)',apply:'حفظ'},month:{title:'ملخص شهري',pick:'اختر الشهر',m1:'مجموع الشهر',m2:'أيام مسجلة',m3:'معدل اليوم',close:'إغلاق',refresh:'تحديث',thead:['التاريخ','البداية','النهاية','استراحة','الصافي','إضافي']},export:{title:'تصدير',scope:'النطاق',format:'الصيغة',optDay:'اليوم الحالي',optMonth:'الشهر المختار',png:'صورة (PNG)',json:'JSON',cancel:'إلغاء',do:'تصدير'}},
+  en:{dir:'ltr',brand:'Saaati',nav:{menu:'Menu',day:'Day',month:'Monthly',settings:'Settings',export:'Export'},themeLight:'Dark',themeDark:'Light',day:{title:'Daily Entry',hint:'Enter start, end and break. Autosaved locally.',date:'Date',start:'🟢 Clock In',end:'🔴 Clock Out',break:'☕️ Break (min)',k1:'Net Today',k2:'Overtime',k3:'Daily Base (h)',k4:'Save Status',saved:'Auto-saved ✅'},settings:{title:'Settings',hint:'Adjust defaults.',daily:'Daily Base (hours)',brdef:'Default Break (min)',apply:'Save'},month:{title:'Monthly Summary',pick:'Pick month',m1:'Month Total',m2:'Logged Days',m3:'Avg/Day',close:'Close',refresh:'Refresh',thead:['Date','Start','End','Break','Net','OT']},export:{title:'Export',scope:'Scope',format:'Format',optDay:'Current Day',optMonth:'Selected Month',png:'Image (PNG)',json:'JSON',cancel:'Cancel',do:'Export'}},
+  de:{dir:'ltr',brand:'Meine Stunden',nav:{menu:'Menü',day:'Tag',month:'Monat',settings:'Einstellungen',export:'Export'},themeLight:'Dunkel',themeDark:'Hell',day:{title:'Tägliche Eingabe',hint:'Start, Ende und Pause. Lokal automatisch gespeichert.',date:'Datum',start:'🟢 Einchecken',end:'🔴 Auschecken',break:'☕️ Pause (Min.)',k1:'Netto heute',k2:'Überstunden',k3:'Tages-Soll (Std)',k4:'Speicherstatus',saved:'Automatisch gespeichert ✅'},settings:{title:'Einstellungen',hint:'Standardwerte anpassen.',daily:'Tages-Soll (Std.)',brdef:'Standardpause (Min.)',apply:'Speichern'},month:{title:'Monatsübersicht',pick:'Monat wählen',m1:'Monatssumme',m2:'Erfasste Tage',m3:'Schnitt/Tag',close:'Schließen',refresh:'Aktualisieren',thead:['Datum','Start','Ende','Pause','Netto','ÜSt']},export:{title:'Export',scope:'Bereich',format:'Format',optDay:'Heutiger Tag',optMonth:'Gewählter Monat',png:'Bild (PNG)',json:'JSON',cancel:'Abbrechen',do:'Exportieren'}}
 };
 const LS_LANG='saaati_lang';
 let currentLang = localStorage.getItem(LS_LANG) || (navigator.language?.startsWith('ar')?'ar':navigator.language?.startsWith('de')?'de':'en');
@@ -335,7 +377,7 @@ themeBtn.onclick=()=>{document.body.classList.toggle('dark'); setThemeLabel();};
 
 /* Utils */
 function h2m(h){if(!h)return 0; const [H,M]=h.split(':').map(Number); return H*60+(M||0);}
-function m2h(m){const hh=Math.floor(m/60),mm=Math.round(m%60); return `${hh}:${String(mm).padStart(2,'0')}`;}
+function m2h(m){m=Math.max(0,Math.floor(m)); const hh=Math.floor(m/60), mm=m%60; return `${hh}:${String(mm).padStart(2,'0')}`;}
 function dayNameIntl(date,lang){try{const fmt=new Intl.DateTimeFormat(lang==='ar'?'ar-EG':lang==='de'?'de-DE':'en-GB',{weekday:'long'}); return fmt.format(date);}catch{return['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][date.getDay()];}}
 
 /* Settings */
@@ -343,14 +385,23 @@ function loadSettings(){const s=JSON.parse(localStorage.getItem('settings')||'{}
 function saveSettings(){const s={daily:parseFloat(stDaily.value||8),break:parseInt(stBreak.value||30,10)}; localStorage.setItem('settings',JSON.stringify(s)); dBase.textContent=String(s.daily); notifySaved();}
 
 /* Day */
-function updateDayName(){const lang=getLang(); if(!dayDate.value){dayDate.value=new Date().toISOString().slice(0,10);} try{dayName.textContent=dayNameIntl(new Date(dayDate.value),lang);}catch{dayName.textContent='—';}}
-function compute(){const base=Math.round(parseFloat(stDaily.value||8)*60); const s=dayStart.value,e=dayEnd.value,br=parseInt(dayBreak.value||0,10); if(!s||!e){dNet.textContent='0:00'; dOT.textContent='0:00'; return;} let sm=h2m(s), em=h2m(e); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-br); const ot=Math.max(0,net-base); dNet.textContent=m2h(net); dOT.textContent=m2h(ot); dBase.textContent=String(stDaily.value||8);}
+function updateDayName(){const lang=getLang(); if(!dayDate.value){try{dayDate.valueAsDate=new Date();}catch{dayDate.value=new Date().toISOString().slice(0,10);} } try{dayName.textContent=dayNameIntl(new Date(dayDate.value),lang);}catch{dayName.textContent='—';}}
+function compute(){
+  const base=Math.round(parseFloat(stDaily.value||8)*60);
+  const s=dayStart.value,e=dayEnd.value,br=Math.max(0, parseInt(dayBreak.value||0,10) || 0);
+  if(!s||!e){dNet.textContent='0:00'; dOT.textContent='0:00'; return;}
+  let sm=h2m(s), em=h2m(e);
+  if(em<sm) em+=1440; // دعم عبور منتصف الليل كما في النسخة الأصلية
+  const net=Math.max(0,(em-sm)-br);
+  const ot=Math.max(0,net-base);
+  dNet.textContent=m2h(net); dOT.textContent=m2h(ot); dBase.textContent=String(stDaily.value||8);
+}
 function notifySaved(){const lang=getLang(); dSave.textContent=I18N[lang].day.saved; setTimeout(()=>dSave.textContent='—',1500);}
 function saveDayLocal(){const p={date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}; localStorage.setItem('day-'+p.date,JSON.stringify(p)); notifySaved();}
 function loadDay(){
   const raw=localStorage.getItem('day-'+dayDate.value);
   if(raw){try{const p=JSON.parse(raw); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=p.break??(stBreak.value||30);}catch{dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30;}}
-  else { dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30; } // لا نملأ أوقات لليوم الجديد
+  else { dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30; }
   compute();
 }
 
@@ -373,10 +424,23 @@ function setLang(lang){
   document.documentElement.lang=lang; document.documentElement.dir=L.dir; document.body.dir=L.dir;
   brandTxt.textContent=L.brand;
   themeBtn.textContent=(document.body.classList.contains('dark')?L.themeDark:L.themeLight);
+
+  // تحديث عناصر التوب بار والقائمة
+  menuToggle.textContent = L.nav.menu;
+  mnuDay.textContent = L.nav.day;
+  mnuMonth.textContent = L.nav.month;
+  mnuSettings.textContent = L.nav.settings;
+  mnuExport.textContent = L.nav.export;
+  authBtn.textContent = (auth.currentUser ?
+    (lang==='de'?'Abmelden':lang==='en'?'Sign out':'تسجيل الخروج') :
+    (lang==='de'?'Anmelden':lang==='en'?'Sign in':'تسجيل'));
+
+  // نصوص اليوم/الإعدادات/الشهر/التصدير
   titleDay.textContent=L.day.title; hintDay.textContent=L.day.hint; lblDate.textContent=L.day.date; lblStart.textContent=L.day.start; lblEnd.textContent=L.day.end; lblBreak.textContent=L.day.break; k1.textContent=L.day.k1; k2.textContent=L.day.k2; k3.textContent=L.day.k3; k4.textContent=L.day.k4;
   titleSettings.textContent=L.settings.title; hintSettings.textContent=L.settings.hint; lblDaily.textContent=L.settings.daily; lblBreakDef.textContent=L.settings.brdef; applySettings.textContent=L.settings.apply;
   titleMonth.textContent=L.month.title; lblPickMonth.textContent=L.month.pick; document.getElementById('mk1').textContent=L.month.m1; document.getElementById('mk2').textContent=L.month.m2; document.getElementById('mk3').textContent=L.month.m3; refreshMonth.textContent=L.month.refresh; closeMonth.textContent=L.month.close;
   titleExport.textContent=L.export.title; lblScope.textContent=L.export.scope; lblFormat.textContent=L.export.format; expScope.options[0].text=L.export.optDay; expScope.options[1].text=L.export.optMonth; expFormat.options[0].text=L.export.png; expFormat.options[1].text=L.export.json; closeExport.textContent=L.export.cancel; doExport.textContent=L.export.do;
+
   localStorage.setItem(LS_LANG,lang);
   updateDayName();
   if(monthArea.dataset.built==='1'){buildMonthTableHead(lang);}
@@ -388,8 +452,8 @@ function showCard(card){[dayCard,settingsCard].forEach(el=>el.style.display='non
 function openExport(){exportModal.classList.add('open'); exportModal.setAttribute('aria-hidden','false');}
 
 function initApp(){
-  // تاريخ اليوم أولاً (لضبط اسم اليوم)
-  dayDate.value=new Date().toISOString().slice(0,10);
+  // عيّن تاريخ اليوم بشكل آمن
+  try{dayDate.valueAsDate=new Date();}catch{dayDate.value=new Date().toISOString().slice(0,10);}
 
   // Drawer
   menuToggle.onclick=()=>{
@@ -417,9 +481,9 @@ function initApp(){
   document.querySelectorAll('.btn-flag').forEach(b=>b.addEventListener('click',()=>{setLang(b.dataset.lang); setActiveLangUI(b.dataset.lang);} ));
   setActiveLangUI(currentLang);
 
-  // Inputs: احسب دائمًا، وحفظ تلقائي عند تعديل النهاية أو الاستراحة
-  [dayStart,dayEnd,dayBreak].forEach(el=>el.addEventListener('input',e=>{compute(); if(e&&(e.target===dayEnd||e.target===dayBreak)) saveDayLocal();}));
-  dayDate.addEventListener('change',()=>{updateDayName(); loadDay();});
+  // Inputs: حساب + حفظ تلقائي على أي تغيير مهم
+  [dayStart,dayEnd,dayBreak].forEach(el=>el.addEventListener('input',()=>{compute(); saveDayLocal();}));
+  dayDate.addEventListener('change',()=>{updateDayName(); loadDay(); saveDayLocal();});
 
   // Settings + month + export
   applySettings.addEventListener('click',()=>{saveSettings(); compute();});
