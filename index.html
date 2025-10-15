@@ -1,96 +1,36 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>Saaati — Sign In</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Saaati — Home (debug)</title>
   <style>
-    :root{--bg:#f6f8fb;--card:#fff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--accent:#3b82f6}
-    .dark{--bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2b40;--accent:#60a5fa}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto Naskh Arabic","Cairo",Tahoma,Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column}
-    .topbar{position:sticky;top:0;z-index:10;background:color-mix(in srgb, var(--card) 92%, transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-    .dark .topbar{background:#0c1426cc}
-    .topbar .inner{max-width:960px;margin:0 auto;padding:8px 12px;display:flex;align-items:center;gap:8px;min-height:52px}
-    .brand{font-weight:800;display:flex;align-items:center;gap:6px;white-space:nowrap}
-    .spacer{flex:1}
-    .btn-sm{height:36px;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
-    .icon-btn{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;padding:0;font-size:18px}
-    .center{flex:1;display:flex;align-items:center;justify-content:center;padding:16px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 26px rgba(15,23,42,.06);padding:20px;max-width:380px;width:100%;text-align:center}
-    h2{margin:0 0 6px}
-    p.desc{margin:0 0 12px;color:var(--muted)}
-    .field{margin:8px 0;text-align:start}
-    .field label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
-    .input{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:#fff;color:#0f172a;font-size:15px}
-    .dark .input{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
-    .btn{width:100%;padding:10px;margin-top:8px;border-radius:10px;border:1px solid var(--line);cursor:pointer;font-weight:700}
-    .btn-primary{background:var(--accent);color:#fff;border-color:transparent}
-    .btn-primary:hover{filter:brightness(.95)}
-    .btn-ghost{background:var(--card)}
-    .btn-google{background:#fff;display:flex;align-items:center;justify-content:center;gap:6px}
-    .btn-google img{width:18px;height:18px}
-    .dark .btn-google{background:#0a1222;border-color:#1f2b40}
-    .error{background:#fee2e2;color:#991b1b;border-radius:10px;padding:8px;margin:8px 0;font-size:14px;display:none}
-    .footer-link{margin-top:12px;font-size:13px}
-    .footer-link a{color:var(--accent);text-decoration:none}
+    body{font-family:system-ui,Arial,sans-serif;margin:0;background:#f6f8fb;color:#0f172a}
+    .wrap{max-width:720px;margin:8vh auto;padding:16px}
+    .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 12px 30px rgba(15,23,42,.08)}
+    h1{margin:0 0 10px}
+    .muted{color:#64748b}
+    button{height:40px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;padding:0 12px;cursor:pointer}
   </style>
 </head>
 <body>
-  <!-- Top bar -->
-  <div class="topbar">
-    <div class="inner">
-      <div class="brand">⏱️ <span id="brandTxt">Saaati</span></div>
-      <div class="spacer"></div>
-      <button id="themeBtn" class="btn-sm icon-btn" aria-label="Toggle theme">🌙</button>
-    </div>
-  </div>
-
-  <!-- Content -->
-  <div class="center">
+  <div class="wrap">
     <div class="card">
-      <h2 id="title">Sign in</h2>
-      <p id="subtitle" class="desc">Sign in or create an account to sync your data across devices.</p>
-
-      <div id="errorBox" class="error"></div>
-
-      <div class="field">
-        <label id="lblEmail" for="email">Email</label>
-        <input id="email" type="email" class="input" placeholder="you@example.com" />
+      <h1>Welcome</h1>
+      <p class="muted">If you see your email below, auth is working.</p>
+      <p id="status">Checking auth...</p>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button id="logout">Sign out</button>
+        <a href="login.html"><button>Go to login</button></a>
       </div>
-
-      <div class="field">
-        <label id="lblPassword" for="password">Password</label>
-        <input id="password" type="password" class="input" placeholder="••••••••" />
-      </div>
-
-      <button id="loginBtn" class="btn btn-primary">Sign in</button>
-      <button id="signupBtn" class="btn btn-ghost">Create new account</button>
-      <button id="googleBtn" class="btn btn-google">
-        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" />
-        <span>Continue with Google</span>
-      </button>
-      <button id="skipBtn" class="btn btn-ghost">Skip for now</button>
-
-      <p class="footer-link"><a href="index.html">← Back to app</a></p>
+      <pre id="err" style="color:#b91c1c;margin-top:12px"></pre>
     </div>
   </div>
 
-  <!-- Firebase compat (بدون modules) -->
+  <!-- Firebase compat (no modules) -->
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
-
   <script>
-    // === Theme toggle (بسيط) ===
-    (function(){
-      const btn=document.getElementById('themeBtn');
-      function setIcon(){ btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙'; }
-      btn.addEventListener('click',()=>{ document.body.classList.toggle('dark'); setIcon(); });
-      setIcon();
-    })();
-
-    // === Firebase init (compat) ===
     const firebaseConfig = {
       apiKey: "AIzaSyBpzQ4GRDzdYCuMvsj3rrWN8Ck0GLHiB2g",
       authDomain: "saaati-pro.firebaseapp.com",
@@ -102,63 +42,19 @@
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-
-    // بقاء الجلسة محليًا
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
-
-    // === Helpers ===
     const $ = (id)=>document.getElementById(id);
-    const errorBox = $('errorBox');
-    function showError(msg){ errorBox.textContent = msg; errorBox.style.display = 'block'; setTimeout(()=> errorBox.style.display='none', 5000); }
-    function reqFields(){
-      if(!$('email').value.trim() || !$('password').value.trim()){ showError('Please enter email and password.'); return false; }
-      return true;
-    }
+    const statusEl = $("status"), errEl = $("err");
 
-    // === Email/Password login ===
-    $('loginBtn').addEventListener('click', async ()=>{
-      try{
-        if(!reqFields()) return;
-        await auth.signInWithEmailAndPassword($('email').value.trim(), $('password').value.trim());
-        location.href='index.html';
-      }catch(e){ showError(e && e.code ? e.code : String(e)); }
-    });
-
-    // === Email/Password signup ===
-    $('signupBtn').addEventListener('click', async ()=>{
-      try{
-        if(!reqFields()) return;
-        await auth.createUserWithEmailAndPassword($('email').value.trim(), $('password').value.trim());
-        location.href='index.html';
-      }catch(e){ showError(e && e.code ? e.code : String(e)); }
-    });
-
-    // === Google Sign-In (popup → fallback redirect) ===
-    $('googleBtn').addEventListener('click', async ()=>{
-      const provider = new firebase.auth.GoogleAuthProvider();
-      try{
-        await auth.signInWithPopup(provider);
-        location.href='index.html';
-      }catch(e){
-        if(e && (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user')){
-          showError(e.code + ' → trying redirect...');
-          auth.signInWithRedirect(provider);
-        }else{
-          showError(e && e.code ? e.code : String(e));
-        }
+    auth.onAuthStateChanged((user)=>{
+      if(user){
+        statusEl.textContent = "Signed in as: " + (user.displayName || user.email);
+      }else{
+        // لو مش مسجل، رجّعه للـ login
+        location.href = "login.html";
       }
     });
 
-    // نتيجة redirect إن وجدت
-    auth.getRedirectResult().then((result)=>{
-      if(result && result.user){ location.href='index.html'; }
-    }).catch((e)=> showError(e && e.code ? e.code : String(e)));
-
-    // لو المستخدم داخل بالفعل
-    auth.onAuthStateChanged((user)=>{ if(user) location.href='index.html'; });
-
-    // Skip
-    $('skipBtn').addEventListener('click', ()=> location.href='index.html');
+    $("logout").onclick = ()=> auth.signOut().then(()=> location.href="login.html").catch(e=> errEl.textContent = e?.message || e);
   </script>
 </body>
 </html>
