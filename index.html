@@ -1,60 +1,222 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Saaati — Home (debug)</title>
-  <style>
-    body{font-family:system-ui,Arial,sans-serif;margin:0;background:#f6f8fb;color:#0f172a}
-    .wrap{max-width:720px;margin:8vh auto;padding:16px}
-    .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 12px 30px rgba(15,23,42,.08)}
-    h1{margin:0 0 10px}
-    .muted{color:#64748b}
-    button{height:40px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;padding:0 12px;cursor:pointer}
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>Saaati — Home</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>Welcome</h1>
-      <p class="muted">If you see your email below, auth is working.</p>
-      <p id="status">Checking auth...</p>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button id="logout">Sign out</button>
-        <a href="login.html"><button>Go to login</button></a>
-      </div>
-      <pre id="err" style="color:#b91c1c;margin-top:12px"></pre>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="inner">
+      <button id="menuToggle" class="btn" aria-expanded="false">☰ Menu</button>
+      <div class="brand brand-badge">⏱️ <span id="brandTxt">Saaati</span></div>
+      <div id="userPill" class="user-pill">Guest</div>
     </div>
   </div>
+
+  <!-- Drawer Menu -->
+  <div id="menuDrawer" class="menu-drawer" aria-hidden="true">
+    <div class="menu-scroller">
+      <div class="menu-section">
+        <div class="menu-title" id="navTitle">Navigation</div>
+        <div class="menu-list">
+          <button id="mnuDay" class="btn">📅 Day</button>
+          <button id="mnuMonth" class="btn">🗓️ Monthly</button>
+          <button id="mnuSettings" class="btn">⚙️ Settings</button>
+          <button id="mnuExport" class="btn">📦 Export</button>
+        </div>
+      </div>
+      <hr class="hr" />
+
+      <div class="menu-section">
+        <div class="menu-title" id="prefTitle">Preferences</div>
+        <div class="menu-row" id="langRow">
+          <button class="lang-chip" data-lang="en" data-active="true">🌐 EN</button>
+          <button class="lang-chip" data-lang="ar">🌐 AR</button>
+          <button class="lang-chip" data-lang="de">🌐 DE</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
+          <label for="darkToggle" style="font-weight:700" id="lblTheme">Dark mode</label>
+          <label class="switch" title="Dark mode">
+            <input type="checkbox" id="darkToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <hr class="hr" />
+
+      <div class="menu-section">
+        <div class="menu-title" id="acctTitle">Account</div>
+        <div class="menu-list">
+          <button id="authBtn" class="btn">Sign out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- Day -->
+    <div class="card" id="dayCard">
+      <h1 id="titleDay">Daily Entry</h1>
+      <p class="small" id="hintDay">Enter start, end and break. Autosaved locally.</p>
+
+      <div class="date-row">
+        <div class="date-input">
+          <label id="lblDate">Date</label>
+          <input id="dayDate" class="input" type="date" />
+        </div>
+        <div class="pill" id="dayName">—</div>
+      </div>
+
+      <div class="time-grid">
+        <div class="time-box start">
+          <div class="title" id="lblStart">🟢 Clock In</div>
+          <input id="dayStart" class="input" type="time" step="60" inputmode="numeric" />
+        </div>
+        <div class="time-box end">
+          <div class="title" id="lblEnd">🔴 Clock Out</div>
+          <input id="dayEnd" class="input" type="time" step="60" inputmode="numeric" />
+        </div>
+        <div class="time-box break-col">
+          <div class="title" id="lblBreak">☕️ Break (min)</div>
+          <input id="dayBreak" class="input" type="number" min="0" step="5" value="30" />
+        </div>
+      </div>
+
+      <!-- Annotations -->
+      <div class="annot-grid">
+        <div class="form-field">
+          <label id="lblStatus">Day Status</label>
+          <select id="dayStatus" class="select">
+            <option value="work" selected>Work</option>
+            <option value="vacation">Vacation</option>
+            <option value="sick">Sick</option>
+            <option value="absent">Absent (Other)</option>
+          </select>
+        </div>
+        <div class="form-field" id="reasonWrap" style="display:none">
+          <label id="lblReason">Reason / Note</label>
+          <input id="dayReason" class="select" placeholder="Reason for absence..." />
+        </div>
+        <div class="form-field" style="grid-column:1 / -1">
+          <label id="lblTaskNote">Task Note (what you did)</label>
+          <textarea id="taskNote" class="textarea" placeholder="Brief note about tasks completed today..."></textarea>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpis">
+        <div class="kcard"><h3 id="k1">Net Today</h3><div class="val" id="dNet">0:00</div></div>
+        <div class="kcard"><h3 id="kWorkTitle">Work Hours</h3><div class="val" id="dWorkHours">0:00</div></div>
+        <div class="kcard"><h3 id="k2">Overtime</h3><div class="val" id="dOT">0:00</div></div>
+        <div class="kcard"><h3 id="k3">Daily Base (h)</h3><div class="val" id="dBase">8</div></div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="card" id="settingsCard" style="display:none">
+      <h1 id="titleSettings">Settings</h1>
+      <p class="small" id="hintSettings">Adjust defaults.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+        <div>
+          <label id="lblDaily">Daily Base (hours)</label>
+          <input id="stDaily" class="input" type="number" step="0.25" min="0" value="8">
+        </div>
+        <div>
+          <label id="lblBreakDef">Default Break (min)</label>
+          <input id="stBreak" class="input" type="number" step="5" min="0" value="30">
+        </div>
+      </div>
+      <button id="applySettings" class="btn" style="margin-top:12px">Save</button>
+    </div>
+  </div>
+
+  <!-- Month modal -->
+  <div id="monthModal" class="modal" aria-hidden="true">
+    <div class="dialog">
+      <h2 id="titleMonth">Monthly Summary</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div><label class="small" id="lblPickMonth">Pick month</label><input type="month" id="monthPick" class="input" style="height:40px"></div>
+        <button id="refreshMonth" class="btn">Refresh</button>
+      </div>
+      <div id="monthArea" style="margin-top:12px"></div>
+      <div id="notesArea" style="margin-top:16px"></div>
+      <div class="kpis">
+        <div class="kcard"><h3 id="mk1">Month Total</h3><div class="val" id="mTotal">0:00</div></div>
+        <div class="kcard"><h3 id="mk2">Logged Days</h3><div class="val" id="mDays">0</div></div>
+        <div class="kcard"><h3 id="mk3">Avg/Day</h3><div class="val" id="mAvg">0:00</div></div>
+      </div>
+      <div class="actions"><button id="closeMonth" class="btn">Close</button></div>
+    </div>
+  </div>
+
+  <!-- Export modal -->
+  <div id="exportModal" class="modal" aria-hidden="true">
+    <div class="dialog" style="max-width:620px">
+      <h2 id="titleExport">Export</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label id="lblScope">Scope</label>
+          <select id="expScope" class="input" style="height:40px">
+            <option value="day">Day</option>
+            <option value="month">Month</option>
+            <option value="biweek">Two Weeks</option>
+          </select>
+        </div>
+        <div>
+          <label id="lblFormat">Format</label>
+          <select id="expFormat" class="input" style="height:40px">
+            <option value="png">Image (PNG)</option>
+            <option value="json">JSON</option>
+          </select>
+        </div>
+        <div>
+          <label id="lblLang">Export Language</label>
+          <select id="expLang" class="input" style="height:40px">
+            <option value="en">English</option>
+            <option value="ar">العربية</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+        <div id="biweekWrap" style="display:none">
+          <label id="lblBwStart">Two Weeks Start</label>
+          <input id="bwStart" type="date" class="input" />
+        </div>
+      </div>
+      <div class="actions" style="margin-top:10px">
+        <button id="closeExport" class="btn">Cancel</button>
+        <button id="doExport" class="btn">Export</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Save Modal -->
+  <div id="confirmSaveModal" class="modal" aria-hidden="true">
+    <div class="dialog confirm-dialog">
+      <h2 id="csTitle">Save changes?</h2>
+      <p id="csBody" class="confirm-body">You made changes. Do you want to save them?</p>
+      <div class="actions">
+        <button id="csCancel" class="btn btn-danger">No</button>
+        <button id="csOk" class="btn btn-primary">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">Saved ✅</div>
+
+  <!-- html2canvas (export PNG) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
 
   <!-- Firebase compat (no modules) -->
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBpzQ4GRDzdYCuMvsj3rrWN8Ck0GLHiB2g",
-      authDomain: "saaati-pro.firebaseapp.com",
-      projectId: "saaati-pro",
-      storageBucket: "saaati-pro.firebasestorage.app",
-      messagingSenderId: "719485178559",
-      appId: "1:719485178559:web:56460b57bb0560d8496c0a",
-      measurementId: "G-2KBHPQP07X"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const $ = (id)=>document.getElementById(id);
-    const statusEl = $("status"), errEl = $("err");
 
-    auth.onAuthStateChanged((user)=>{
-      if(user){
-        statusEl.textContent = "Signed in as: " + (user.displayName || user.email);
-      }else{
-        // لو مش مسجل، رجّعه للـ login
-        location.href = "login.html";
-      }
-    });
-
-    $("logout").onclick = ()=> auth.signOut().then(()=> location.href="login.html").catch(e=> errEl.textContent = e?.message || e);
-  </script>
+  <!-- App -->
+  <script src="app.js"></script>
 </body>
 </html>
