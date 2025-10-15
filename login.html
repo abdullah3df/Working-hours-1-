@@ -142,6 +142,8 @@
       signInWithEmailAndPassword,
       GoogleAuthProvider,
       signInWithPopup,
+      signInWithRedirect,
+      getRedirectResult,
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
@@ -159,7 +161,8 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     await setPersistence(auth, browserLocalPersistence);
-    const provider = new GoogleAuthProvider();
+
+    const providerGoogle = new GoogleAuthProvider();
 
     /* ===== I18N ===== */
     const I18N = {
@@ -171,7 +174,17 @@
         login:'Sign in', signup:'Create new account',
         google:'Continue with Google', skip:'Skip for now',
         back:'← Back to app',
-        errors:{login:'Sign-in error: ', signup:'Sign-up error: ', google:'Google sign-in error: '}
+        err:{
+          empty:'Please enter email and password.',
+          'auth/invalid-email':'Invalid email address.',
+          'auth/user-not-found':'No user found with this email.',
+          'auth/wrong-password':'Incorrect password.',
+          'auth/weak-password':'Password should be at least 6 characters.',
+          'auth/popup-blocked':'Popup was blocked. Trying redirect...',
+          'auth/popup-closed-by-user':'Popup closed. Trying redirect...',
+          'auth/unauthorized-domain':'This domain is not authorized in Firebase.',
+          default:'Unexpected error: '
+        }
       },
       ar: {
         dir:'rtl', brand:'ساعتي',
@@ -181,7 +194,17 @@
         login:'دخول', signup:'إنشاء حساب جديد',
         google:'دخول باستخدام Google', skip:'تخطي الآن',
         back:'← العودة للتطبيق',
-        errors:{login:'خطأ في تسجيل الدخول: ', signup:'خطأ في إنشاء الحساب: ', google:'خطأ في تسجيل الدخول بـ Google: '}
+        err:{
+          empty:'يرجى إدخال البريد وكلمة المرور.',
+          'auth/invalid-email':'بريد إلكتروني غير صالح.',
+          'auth/user-not-found':'لا يوجد مستخدم بهذا البريد.',
+          'auth/wrong-password':'كلمة المرور غير صحيحة.',
+          'auth/weak-password':'كلمة المرور يجب أن تكون 6 أحرف على الأقل.',
+          'auth/popup-blocked':'تم حظر النافذة المنبثقة. سيُجرّب التحويل...',
+          'auth/popup-closed-by-user':'تم إغلاق النافذة. سيُجرّب التحويل...',
+          'auth/unauthorized-domain':'هذا النطاق غير مصرّح به في Firebase.',
+          default:'خطأ غير متوقع: '
+        }
       },
       de: {
         dir:'ltr', brand:'Meine Stunden',
@@ -191,7 +214,17 @@
         login:'Anmelden', signup:'Neues Konto erstellen',
         google:'Mit Google fortfahren', skip:'Jetzt überspringen',
         back:'← Zur App',
-        errors:{login:'Anmeldefehler: ', signup:'Registrierungsfehler: ', google:'Google-Anmeldefehler: '}
+        err:{
+          empty:'Bitte E-Mail und Passwort eingeben.',
+          'auth/invalid-email':'Ungültige E-Mail-Adresse.',
+          'auth/user-not-found':'Kein Benutzer mit dieser E-Mail gefunden.',
+          'auth/wrong-password':'Falsches Passwort.',
+          'auth/weak-password':'Passwort muss mind. 6 Zeichen haben.',
+          'auth/popup-blocked':'Popup blockiert. Redirect wird versucht...',
+          'auth/popup-closed-by-user':'Popup geschlossen. Redirect wird versucht...',
+          'auth/unauthorized-domain':'Diese Domain ist in Firebase nicht autorisiert.',
+          default:'Unerwarteter Fehler: '
+        }
       }
     };
 
@@ -232,6 +265,10 @@
     function updateLangLabel(){
       langLabel.textContent = (currentLang==='ar'?'AR' : currentLang==='de'?'DE' : 'EN');
     }
+    function tErr(code){
+      const L = I18N[currentLang] || I18N.en;
+      return L.err[code] || (L.err.default + code);
+    }
     function setLang(lang){
       currentLang = lang;
       const L = I18N[lang] || I18N.en;
@@ -270,48 +307,65 @@
       });
     });
 
-    /* ===== Auth actions ===== */
+    /* ===== Errors UI ===== */
     function showError(msg){
       errorBox.textContent = msg;
       errorBox.style.display = 'block';
-      setTimeout(()=> errorBox.style.display='none', 4500);
+      setTimeout(()=> errorBox.style.display='none', 5000);
+    }
+    function requireFields(){
+      if(!emailInput.value.trim() || !passwordInput.value.trim()){
+        showError(tErr('empty'));
+        return false;
+      }
+      return true;
     }
 
+    /* ===== Auth actions ===== */
     loginBtn.onclick = async ()=>{
       try{
-        const email = emailInput.value.trim();
-        const pass  = passwordInput.value.trim();
-        await signInWithEmailAndPassword(auth, email, pass);
+        if(!requireFields()) return;
+        await signInWithEmailAndPassword(auth, emailInput.value.trim(), passwordInput.value.trim());
         window.location.href = 'index.html';
       }catch(err){
-        const L = I18N[currentLang] || I18N.en;
-        showError(L.errors.login + err.code);
+        showError(tErr(err.code));
       }
     };
 
     signupBtn.onclick = async ()=>{
       try{
-        const email = emailInput.value.trim();
-        const pass  = passwordInput.value.trim();
-        await createUserWithEmailAndPassword(auth, email, pass);
-        alert('✅');
+        if(!requireFields()) return;
+        await createUserWithEmailAndPassword(auth, emailInput.value.trim(), passwordInput.value.trim());
         window.location.href = 'index.html';
       }catch(err){
-        const L = I18N[currentLang] || I18N.en;
-        showError(L.errors.signup + err.code);
+        showError(tErr(err.code));
       }
     };
 
-    const providerGoogle = provider; // alias
+    // Google with popup → fallback to redirect
     googleBtn.onclick = async ()=>{
       try{
         await signInWithPopup(auth, providerGoogle);
         window.location.href = 'index.html';
       }catch(err){
-        const L = I18N[currentLang] || I18N.en;
-        showError(L.errors.google + err.code);
+        if(err?.code==='auth/popup-blocked' || err?.code==='auth/popup-closed-by-user'){
+          showError(tErr(err.code));
+          await signInWithRedirect(auth, providerGoogle);
+        }else{
+          showError(tErr(err.code));
+        }
       }
     };
+
+    // Handle redirect result (after fallback)
+    try{
+      const result = await getRedirectResult(auth);
+      if(result && result.user){
+        window.location.href = 'index.html';
+      }
+    }catch(err){
+      showError(tErr(err.code));
+    }
 
     skipBtn.onclick = ()=>{ window.location.href = 'index.html'; };
 
@@ -322,7 +376,6 @@
 
     /* ===== Init ===== */
     (function init(){
-      // لغة افتراضية EN عند أول زيارة
       if(!localStorage.getItem(LS_LANG)){ localStorage.setItem(LS_LANG,'en'); currentLang='en'; }
       setLang(currentLang);
       setThemeIcon();
