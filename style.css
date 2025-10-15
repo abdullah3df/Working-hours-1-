@@ -1,17 +1,10 @@
-:root{
-  --bg:#f6f8fb;--card:#fff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6;--shadow:0 12px 30px rgba(15,23,42,.08);
-}
+:root{--bg:#f6f8fb;--card:#fff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6;--shadow:0 12px 30px rgba(15,23,42,.08)}
 .dark{--bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2b40;--accent:#60a5fa;--shadow:0 18px 40px rgba(0,0,0,.4)}
 *{box-sizing:border-box}
-body{
-  margin:0;
-  background:
-    radial-gradient(1200px 600px at 10% -10%,rgba(59,130,246,.08),transparent),
-    radial-gradient(1000px 600px at 110% -20%,rgba(22,163,74,.08),transparent),
-    var(--bg);
-  color:var(--ink);
-  font-family:system-ui,"Noto Naskh Arabic","Cairo",Tahoma,Arial,sans-serif
-}
+body{margin:0;background:
+  radial-gradient(1200px 600px at 10% -10%,rgba(59,130,246,.08),transparent),
+  radial-gradient(1000px 600px at 110% -20%,rgba(22,163,74,.08),transparent),
+  var(--bg);color:var(--ink);font-family:system-ui,"Noto Naskh Arabic","Cairo",Tahoma,Arial,sans-serif}
 
 /* Topbar */
 .topbar{position:sticky;top:0;z-index:60;background:color-mix(in srgb, var(--card) 92%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
@@ -23,20 +16,10 @@ body{
 .user-pill{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);white-space:nowrap;max-width:32ch;overflow:hidden;text-overflow:ellipsis;box-shadow:var(--shadow)}
 
 /* Drawer */
-.menu-drawer{
-  position:fixed; top:56px; bottom:0; left:0; width:320px;
-  background:var(--card); border-inline-start:1px solid var(--line);
-  box-shadow:var(--shadow); transform:translateX(-100%); transition:transform .25s ease; z-index:70;
-}
+.menu-drawer{position:fixed; top:56px; bottom:0; left:0; width:320px;background:var(--card); border-inline-start:1px solid var(--line);box-shadow:var(--shadow); transform:translateX(-100%); transition:transform .25s ease; z-index:70;}
 .menu-drawer.open{transform:translateX(0)}
 [dir="rtl"] .menu-drawer{left:auto; right:0; transform:translateX(100%)}
 [dir="rtl"] .menu-drawer.open{transform:translateX(0)}
-/* RTL animation fix */
-@keyframes slideIn { from{transform:translateX(-100%)} to{transform:translateX(0)} }
-@keyframes slideInRtl { from{transform:translateX(100%)} to{transform:translateX(0)} }
-.menu-drawer.open{ animation: slideIn .22s ease both; }
-[dir="rtl"] .menu-drawer.open{ animation: slideInRtl .22s ease both; }
-
 .menu-scroller{height:100%; overflow:auto; padding:14px}
 .menu-section{margin:8px 0 14px}
 .menu-title{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px}
@@ -48,15 +31,11 @@ body{
 .lang-chip{padding:8px 10px;border:1px solid var(--line);background:var(--card);border-radius:999px;cursor:pointer;font-weight:700}
 .lang-chip[data-active="true"]{border-color:color-mix(in srgb, var(--accent) 40%, transparent);outline:2px solid color-mix(in srgb, var(--accent) 18%, transparent)}
 
-/* Dark switch */
+/* Dark switch inside menu */
 .switch{position:relative;display:inline-block;width:52px;height:28px}
 .switch input{display:none}
 .slider{position:absolute;inset:0;border-radius:999px;background:#cbd5e1;transition:.2s}
-.slider::before{
-  content:"🌙"; position:absolute; inset:2px auto auto 2px;
-  width:24px;height:24px;display:flex;align-items:center;justify-content:center;
-  background:#fff;border-radius:50%; transition:.2s; font-size:14px;
-}
+.slider::before{content:"🌙"; position:absolute; inset:2px auto auto 2px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:50%; transition:.2s; font-size:14px}
 input:checked + .slider{background:#60a5fa}
 input:checked + .slider::before{content:"☀️"; transform:translateX(24px)}
 
@@ -118,34 +97,27 @@ tbody tr{background:#fff;border:1px solid var(--line)}
 tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
 tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 
-/* Confirm Save */
+/* Confirm Save Modal */
 .confirm-dialog{max-width:520px}
 .confirm-body{color:var(--muted);line-height:1.5}
 .btn-primary{background:#3b82f6;color:#fff;border-color:#3b82f6}
 .btn-danger{background:#f3f4f6;color:#0f172a}
 
 /* Toast */
-.toast{
-  position: fixed; right:16px; top:16px; z-index:120;
-  background: var(--card); color: var(--ink);
-  border:1px solid var(--line); border-radius:12px; padding:10px 12px;
-  box-shadow: var(--shadow); opacity:0; transform: translateY(-6px); pointer-events:none;
-  transition: .25s ease;
-}
+.toast{position: fixed; right:16px; top:16px; z-index:120;background: var(--card); color: var(--ink);border:1px solid var(--line); border-radius:12px; padding:10px 12px;box-shadow: var(--shadow); opacity:0; transform: translateY(-6px); pointer-events:none;transition: .25s ease;}
 .toast.show{ opacity:1; transform: translateY(0) }
 
-/* Anim + focus */
+/* Animations + focus */
 .card, .dialog, .menu-drawer{transition: box-shadow .25s ease, transform .25s ease, background .25s ease, border-color .25s ease;}
-@keyframes fadeUp{ from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
 @media (prefers-reduced-motion: no-preference){
   .card{ animation: fadeUp .25s ease both; }
+  .menu-drawer.open{ animation: slideIn .22s ease both; }
 }
+@keyframes fadeUp{ from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
+@keyframes slideIn{ from{transform:translateX(-100%)} to{transform:translateX(0)} }
+[dir="rtl"] @keyframes slideIn{ from{transform:translateX(100%)} to{transform:translateX(0)} }
 
-:focus-visible{
-  outline: 2px solid color-mix(in srgb, var(--accent) 65%, white);
-  outline-offset: 2px;
-  border-radius: 12px;
-}
+:focus-visible{outline: 2px solid color-mix(in srgb, var(--accent) 65%, white);outline-offset: 2px;border-radius: 12px;}
 
 @media (max-width:720px){.topbar .inner{grid-template-columns:auto 1fr auto}.wrap{padding:10px}}
 @media (max-width:420px){.btn{height:36px;padding:5px 10px}.wrap{margin-bottom:48px}}
