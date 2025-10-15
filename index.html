@@ -11,30 +11,12 @@
 body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto Naskh Arabic","Cairo",Tahoma,Arial,sans-serif}
 
 /* === Topbar (منظّم للموبايل) === */
-.topbar{
-  position:sticky;top:0;z-index:60;
-  background:color-mix(in srgb, var(--card) 92%, transparent);
-  backdrop-filter:blur(8px);
-  border-bottom:1px solid var(--line)
-}
+.topbar{position:sticky;top:0;z-index:60;background:color-mix(in srgb, var(--card) 92%, transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .dark .topbar{background:#0c1426cc}
-.topbar .inner{
-  max-width:1060px;margin:0 auto;
-  padding:8px 12px;
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  gap:8px; align-items:center;
-  min-height:52px;
-}
+.topbar .inner{max-width:1060px;margin:0 auto;padding:8px 12px;display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;min-height:52px}
 .brand{font-weight:800;display:flex;align-items:center;gap:6px;white-space:nowrap}
-.btn-sm{
-  height:36px;padding:6px 10px;border-radius:10px;
-  border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer
-}
-.user-pill{
-  padding:6px 10px;border-radius:999px;border:1px solid var(--line);
-  background:var(--card);white-space:nowrap;max-width:32ch;overflow:hidden;text-overflow:ellipsis
-}
+.btn-sm{height:36px;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.user-pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);white-space:nowrap;max-width:32ch;overflow:hidden;text-overflow:ellipsis}
 .top-actions{display:flex;gap:6px;align-items:center}
 .lang-flags{display:flex;gap:6px;align-items:center;overflow:auto;max-width:42vw}
 .lang-flags::-webkit-scrollbar{display:none}
@@ -42,12 +24,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto 
 .btn-flag.active{outline:2px solid var(--accent)}
 
 /* Drawer menu */
-.menu-drawer{
-  position:fixed; top:52px; bottom:0; left:0; width:280px;
-  background:var(--card); border-inline-start:1px solid var(--line);
-  box-shadow:0 12px 28px rgba(15,23,42,.18);
-  transform:translateX(-100%); transition:transform .25s ease; z-index:55;
-}
+.menu-drawer{position:fixed; top:52px; bottom:0; left:0; width:280px;background:var(--card); border-inline-start:1px solid var(--line);box-shadow:0 12px 28px rgba(15,23,42,.18);transform:translateX(-100%); transition:transform .25s ease; z-index:55}
 .menu-drawer.open{transform:translateX(0)}
 [dir="rtl"] .menu-drawer{left:auto; right:0; transform:translateX(100%)}
 [dir="rtl"] .menu-drawer.open{transform:translateX(0)}
@@ -63,13 +40,9 @@ p.small{color:var(--muted);margin:0 0 12px}
 /* Date row */
 .date-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-bottom:8px}
 .date-input label{display:block;color:var(--muted);font-size:13px;margin:0 0 4px}
-.date-input input{
-  width:100%;height:46px;padding:10px;border-radius:12px;border:1px solid var(--line);
-  background:#fff;color:#0f172a;direction:ltr;text-align:center;font-weight:700;font-size:16px
-}
+.date-input input{width:100%;height:46px;padding:10px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#0f172a;direction:ltr;text-align:center;font-weight:700;font-size:16px}
 .dark .date-input input{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
-.pill{align-self:end;padding:8px 12px;border-radius:999px;border:1px solid var(--line);
-  background:#fff;color:#0f172a;font-size:13px;font-weight:700;min-width:auto;text-align:center}
+.pill{align-self:end;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:#0f172a;font-size:13px;font-weight:700;min-width:auto;text-align:center}
 .dark .pill{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
 
 /* Time grid */
@@ -79,10 +52,7 @@ p.small{color:var(--muted);margin:0 0 12px}
 .dark .time-box{background:#0e1528;border-color:#1f2b40}
 .time-box .title{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px}
 .start .title{color:var(--ok)} .end .title{color:var(--warn)}
-.time-box input{
-  width:100%;height:46px;padding:10px;border-radius:12px;border:1px solid var(--line);
-  background:#fff;color:#0f172a;direction:ltr;text-align:center;font-weight:700;font-size:16px
-}
+.time-box input{width:100%;height:46px;padding:10px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#0f172a;direction:ltr;text-align:center;font-weight:700;font-size:16px}
 .dark .time-box input{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
 .start input{border-color:#86efac;background:#ecfdf5}
 .end input{border-color:#fecaca;background:#fef2f2}
@@ -110,18 +80,9 @@ tbody tr{background:#fff;border:1px solid var(--line)}
 tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
 tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 
-/* تحسينات موبايل أوسع */
-@media (max-width:720px){
-  .topbar .inner{grid-template-columns:auto 1fr; row-gap:6px}
-  .top-actions{grid-column:1 / -1; justify-content:flex-end; overflow:auto}
-  .lang-flags{max-width:100%}
-}
-@media (max-width:420px){
-  .btn-sm{height:34px;padding:4px 8px;font-size:14px}
-  .btn-flag{width:32px;height:32px;font-size:16px}
-  .date-input input,.time-box input{height:44px;font-size:15px}
-  .wrap{padding:10px}
-}
+/* تحسينات موبايل */
+@media (max-width:720px){.topbar .inner{grid-template-columns:auto 1fr; row-gap:6px}.top-actions{grid-column:1 / -1; justify-content:flex-end; overflow:auto}.lang-flags{max-width:100%}}
+@media (max-width:420px){.btn-sm{height:34px;padding:4px 8px;font-size:14px}.btn-flag{width:32px;height:32px;font-size:16px}.date-input input,.time-box input{height:44px;font-size:15px}.wrap{padding:10px}}
 </style>
 </head>
 <body>
@@ -131,8 +92,6 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   <div class="inner">
     <button id="menuToggle" class="btn-sm" aria-expanded="false">☰ القائمة</button>
     <div class="brand">⏱️ <span id="brandTxt">ساعتي</span></div>
-
-    <!-- مجموعة الأزرار اليمنى -->
     <div class="top-actions">
       <div id="userPill" class="user-pill">غير مسجل</div>
       <div class="lang-flags">
@@ -290,7 +249,6 @@ authBtn.onclick = () => {
 onAuthStateChanged(auth, (user) => {
   const lang = getLang();
   if (!user) {
-    // حماية الصفحة
     window.location.href = "login.html";
   } else {
     const name = user.displayName || user.email || 'مستخدم';
@@ -308,6 +266,7 @@ const I18N = {
 const LS_LANG='saaati_lang';
 let currentLang = localStorage.getItem(LS_LANG) || (navigator.language?.startsWith('ar')?'ar':navigator.language?.startsWith('de')?'de':'en');
 function getLang(){return currentLang;}
+function getUILang(){ return document.documentElement.lang || currentLang || 'ar'; }    /* ← NEW */
 function setActiveLangUI(lang){document.querySelectorAll('.btn-flag').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));}
 
 /* Refs */
@@ -381,59 +340,41 @@ function h2m(h){if(!h)return 0; const [H,M]=h.split(':').map(Number); return H*6
 function m2h(m){m=Math.max(0,Math.floor(m)); const hh=Math.floor(m/60), mm=m%60; return `${hh}:${String(mm).padStart(2,'0')}`;}
 function dayNameIntl(date,lang){try{const fmt=new Intl.DateTimeFormat(lang==='ar'?'ar-EG':lang==='de'?'de-DE':'en-GB',{weekday:'long'}); return fmt.format(date);}catch{return['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][date.getDay()];}}
 
+/* Locale helpers (للتصدير) */
+function getLocaleFromLang(lang){ return lang==='ar'?'ar-EG':(lang==='de'?'de-DE':'en-GB'); }   /* ← NEW */
+function formatNow(lang){                                                                              /* ← NEW */
+  const loc=getLocaleFromLang(lang);
+  try{
+    return new Intl.DateTimeFormat(loc,{dateStyle:'medium',timeStyle:'medium',hour12:false,numberingSystem:'latn'}).format(new Date());
+  }catch{ return new Date().toLocaleString(loc); }
+}
+
 /* Settings */
 function loadSettings(){const s=JSON.parse(localStorage.getItem('settings')||'{}'); stDaily.value=s.daily??8; stBreak.value=s.break??30; dBase.textContent=String(stDaily.value);}
 function saveSettings(){const s={daily:parseFloat(stDaily.value||8),break:parseInt(stBreak.value||30,10)}; localStorage.setItem('settings',JSON.stringify(s)); dBase.textContent=String(s.daily); notifySaved();}
 
 /* Day */
-function updateDayName(){
-  const lang=getLang();
-  if(!dayDate.value){try{dayDate.valueAsDate=new Date();}catch{dayDate.value=new Date().toISOString().slice(0,10);} }
-  try{dayName.textContent=dayNameIntl(new Date(dayDate.value),lang);}catch{dayName.textContent='—';}
-}
-function compute(){
-  const base=Math.round(parseFloat(stDaily.value||8)*60);
-  const s=dayStart.value,e=dayEnd.value,br=Math.max(0, parseInt(dayBreak.value||0,10) || 0);
-  if(!s||!e){dNet.textContent='0:00'; dOT.textContent='0:00'; return;}
-  let sm=h2m(s), em=h2m(e);
-  if(em<sm) em+=1440; // دعم عبور منتصف الليل
-  const net=Math.max(0,(em-sm)-br);
-  const ot=Math.max(0,net-base);
-  dNet.textContent=m2h(net); dOT.textContent=m2h(ot); dBase.textContent=String(stDaily.value||8);
-}
+function updateDayName(){const lang=getLang(); if(!dayDate.value){try{dayDate.valueAsDate=new Date();}catch{dayDate.value=new Date().toISOString().slice(0,10);} } try{dayName.textContent=dayNameIntl(new Date(dayDate.value),lang);}catch{dayName.textContent='—';}}
+function compute(){const base=Math.round(parseFloat(stDaily.value||8)*60); const s=dayStart.value,e=dayEnd.value,br=Math.max(0, parseInt(dayBreak.value||0,10) || 0); if(!s||!e){dNet.textContent='0:00'; dOT.textContent='0:00'; return;} let sm=h2m(s), em=h2m(e); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-br); const ot=Math.max(0,net-base); dNet.textContent=m2h(net); dOT.textContent=m2h(ot); dBase.textContent=String(stDaily.value||8);}
 function notifySaved(){const lang=getLang(); dSave.textContent=I18N[lang].day.saved; setTimeout(()=>dSave.textContent='—',1500);}
 function saveDayLocal(){const p={date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}; localStorage.setItem('day-'+p.date,JSON.stringify(p)); notifySaved();}
-function loadDay(){
-  const raw=localStorage.getItem('day-'+dayDate.value);
-  if(raw){try{const p=JSON.parse(raw); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=p.break??(stBreak.value||30);}catch{dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30;}}
-  else { dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30; }
-  compute();
-}
+function loadDay(){const raw=localStorage.getItem('day-'+dayDate.value); if(raw){try{const p=JSON.parse(raw); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=p.break??(stBreak.value||30);}catch{dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30;}} else { dayStart.value=''; dayEnd.value=''; dayBreak.value=stBreak.value||30; } compute();}
 
 /* Month */
 function buildMonthTableHead(lang){const L=I18N[lang]; const thead=monthArea.querySelector('thead'); if(thead){thead.innerHTML=`<tr>${L.month.thead.map(h=>`<th>${h}</th>`).join('')}</tr>`;}}
 function openMonth(){if(!monthPick.value){monthPick.value=dayDate.value.slice(0,7);} monthModal.classList.add('open'); monthModal.setAttribute('aria-hidden','false'); refreshMonthSummary();}
 function refreshMonthSummary(){const month=monthPick.value||dayDate.value.slice(0,7); const [y,mo]=month.split('-').map(Number); const first=new Date(y,mo-1,1), last=new Date(y,mo,0); const baseDay=Math.round(parseFloat(stDaily.value||8)*60); const rows=[]; let total=0, daysCount=0; for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){const key='day-'+d.toISOString().slice(0,10); const raw=localStorage.getItem(key); if(!raw) continue; try{const p=JSON.parse(raw); if(p.start&&p.end){let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-parseInt(p.break||0,10)); const ot=Math.max(0,net-baseDay); rows.push([key.slice(4),p.start,p.end,p.break||0,m2h(net),m2h(ot)]); total+=net; daysCount++; }}catch{}} rows.sort((a,b)=>a[0]<b[0]?-1:1); const lang=getLang(); const L=I18N[lang]; let html=`<table class="table"><thead></thead><tbody>`; rows.forEach(r=> html+=`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`); html+='</tbody></table>'; monthArea.innerHTML=html; monthArea.dataset.built='1'; buildMonthTableHead(lang); mTotal.textContent=m2h(total); mDays.textContent=String(daysCount); mAvg.textContent=daysCount?m2h(Math.round(total/daysCount)):'0:00';}
 
-/* Locale helper لاختيار لغة الطابع الزمني في التصدير */
-function getLocaleFromLang(lang){ return lang==='ar' ? 'ar-EG' : (lang==='de' ? 'de-DE' : 'en-GB'); }
+/* ===== Export helpers ===== */
+async function nodeToPNGAndDownload(node,filename){if(typeof html2canvas==='undefined'){alert('Image export unavailable.');return;} document.body.appendChild(node); const canvas=await html2canvas(node,{scale:2,backgroundColor:'#ffffff'}); const dataURL=canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=dataURL; a.download=filename.endsWith('.png')?filename:`${filename}.png`; a.click(); node.remove();}
 
-/* Export (PNG/JSON) */
-async function nodeToPNGAndDownload(node,filename){
-  if(typeof html2canvas==='undefined'){alert('Image export unavailable.');return;}
-  document.body.appendChild(node);
-  const canvas=await html2canvas(node,{scale:2,backgroundColor:'#ffffff'});
-  const dataURL=canvas.toDataURL('image/png');
-  const a=document.createElement('a'); a.href=dataURL; a.download=filename.endsWith('.png')?filename:`${filename}.png`; a.click();
-  node.remove();
-}
+/* Export (PNG/JSON) — يَستخدم لغة الواجهة الحالية دائمًا */
 function exportDayPNG(){
-  const lang=getLang(); const L=I18N[lang]; const loc=getLocaleFromLang(lang);
-  const node=document.createElement('div');
-  node.lang=lang; node.dir=L.dir;
+  const lang=getUILang(); const L=I18N[lang];
+  const node=document.createElement('div'); node.lang=lang; node.dir=L.dir;
   node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff;';
   node.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <h2 style="margin:0">${L.day.title}</h2><div>${new Date().toLocaleString(loc)}</div>
+      <h2 style="margin:0">${L.day.title}</h2><div>${formatNow(lang)}</div>
     </div>
     <div style="margin:6px 0">${L.day.date}: <strong>${dayDate.value}</strong></div>
     <div style="margin:6px 0">${L.day.start.replace('🟢 ','')}: <strong>${dayStart.value||'-'}</strong>
@@ -445,47 +386,63 @@ function exportDayPNG(){
       — ${L.settings.daily}: <strong>${stDaily.value}</strong></div>`;
   nodeToPNGAndDownload(node,`day-${dayDate.value}.png`);
 }
+
 function exportMonthPNG(){
-  refreshMonthSummary();
-  const lang=getLang(); const L=I18N[lang]; const loc=getLocaleFromLang(lang);
+  // أعِد بناء البيانات محليًا ثم صدّر
   const month=monthPick.value||dayDate.value.slice(0,7);
-  const node=document.createElement('div');
-  node.lang=lang; node.dir=L.dir;
+  const [y,mo]=month.split('-').map(Number);
+  const first=new Date(y,mo-1,1), last=new Date(y,mo,0);
+  const baseDay=Math.round(parseFloat(stDaily.value||8)*60);
+  const rows=[];
+  for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){
+    const key='day-'+d.toISOString().slice(0,10);
+    const raw=localStorage.getItem(key); if(!raw) continue;
+    try{
+      const p=JSON.parse(raw); if(!(p.start&&p.end)) continue;
+      let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440;
+      const net=Math.max(0,(em-sm)-parseInt(p.break||0,10));
+      const ot=Math.max(0,net-baseDay);
+      rows.push([key.slice(4),p.start,p.end,p.break||0,m2h(net),m2h(ot)]);
+    }catch{}
+  }
+  rows.sort((a,b)=>a[0]<b[0]?-1:1);
+
+  const lang=getUILang(); const L=I18N[lang];
+  const node=document.createElement('div'); node.lang=lang; node.dir=L.dir;
   node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff; width:700px;';
-  node.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <h2 style="margin:0">${L.month.title}</h2><div>${new Date().toLocaleString(loc)}</div>
+
+  let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h2 style="margin:0">${L.month.title}</h2><div>${formatNow(lang)}</div>
     </div>
     <div style="margin-bottom:8px;font-weight:700">${month}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center">
-        <div style="color:#475569;font-size:13px">${L.month.m1}</div>
-        <div style="font-size:20px;font-weight:800">${mTotal.textContent}</div>
-      </div>
-      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center">
-        <div style="color:#475569;font-size:13px">${L.month.m2}</div>
-        <div style="font-size:20px;font-weight:800">${mDays.textContent}</div>
-      </div>
-      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center">
-        <div style="color:#475569;font-size:13px">${L.month.m3}</div>
-        <div style="font-size:20px;font-weight:800">${mAvg.textContent}</div>
-      </div>
+    <table style="width:100%;border-collapse:separate;border-spacing:0 8px">
+      <thead><tr>${L.month.thead.map(h=>`<th style="text-align:center;color:#475569;font-size:13px">${h}</th>`).join('')}</tr></thead>
+      <tbody>`;
+  rows.forEach(r=>{ html+=`<tr style="background:#fff;border:1px solid #e2e8f0">
+      <td style="padding:8px 10px">${r[0]}</td><td style="padding:8px 10px">${r[1]}</td>
+      <td style="padding:8px 10px">${r[2]}</td><td style="padding:8px 10px">${r[3]}</td>
+      <td style="padding:8px 10px">${r[4]}</td><td style="padding:8px 10px">${r[5]}</td></tr>`;});
+  html+=`</tbody></table>`;
+
+  const totalMins=rows.reduce((t,r)=>{const [h,m]=r[4].split(':').map(Number);return t+h*60+m;},0);
+  const days=rows.length;
+  const avgMins=days?Math.round(totalMins/days):0;
+  const fmt=(m)=>`${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`;
+
+  html+=`<div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px;min-width:180px;text-align:center">
+        <div style="color:#475569;font-size:13px">${L.month.m1}</div><div style="font-size:20px;font-weight:800">${fmt(totalMins)}</div></div>
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px;min-width:180px;text-align:center">
+        <div style="color:#475569;font-size:13px">${L.month.m2}</div><div style="font-size:20px;font-weight:800">${days}</div></div>
+      <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px;min-width:180px;text-align:center">
+        <div style="color:#475569;font-size:13px">${L.month.m3}</div><div style="font-size:20px;font-weight:800">${fmt(avgMins)}</div></div>
     </div>`;
+  node.innerHTML=html;
   nodeToPNGAndDownload(node,`month-${month}.png`);
 }
-function exportDayJSON(){
-  const lang=getLang();
-  const data={meta:{scope:'day',lang,date:dayDate.value,exportedAt:new Date().toISOString()},payload:{date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}};
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`day-${dayDate.value}.json`; a.click(); URL.revokeObjectURL(url);
-}
-function exportMonthJSON(){
-  refreshMonthSummary();
-  const month=monthPick.value||dayDate.value.slice(0,7);
-  const rows=[...monthArea.querySelectorAll('tbody tr')].map(tr=>[...tr.children].map(td=>td.textContent.trim()));
-  const data={meta:{scope:'month',month,exportedAt:new Date().toISOString()},rows,totals:{total:mTotal.textContent,days:mDays.textContent,avg:mAvg.textContent}};
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`month-${month}.json`; a.click(); URL.revokeObjectURL(url);
-}
+
+function exportDayJSON(){const lang=getUILang(); const data={meta:{scope:'day',lang,date:dayDate.value,exportedAt:new Date().toISOString()},payload:{date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`day-${dayDate.value}.json`; a.click(); URL.revokeObjectURL(url);}
+function exportMonthJSON(){refreshMonthSummary(); const month=monthPick.value||dayDate.value.slice(0,7); const rows=[...monthArea.querySelectorAll('tbody tr')].map(tr=>[...tr.children].map(td=>td.textContent.trim())); const data={meta:{scope:'month',month,exportedAt:new Date().toISOString()},rows,totals:{total:mTotal.textContent,days:mDays.textContent,avg:mAvg.textContent}}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`month-${month}.json`; a.click(); URL.revokeObjectURL(url);}
 
 /* لغة */
 function setLang(lang){
@@ -494,23 +451,12 @@ function setLang(lang){
   document.documentElement.lang=lang; document.documentElement.dir=L.dir; document.body.dir=L.dir;
   brandTxt.textContent=L.brand;
   themeBtn.textContent=(document.body.classList.contains('dark')?L.themeDark:L.themeLight);
-
-  // تحديث عناصر التوب بار والقائمة
-  menuToggle.textContent = L.nav.menu;
-  mnuDay.textContent = L.nav.day;
-  mnuMonth.textContent = L.nav.month;
-  mnuSettings.textContent = L.nav.settings;
-  mnuExport.textContent = L.nav.export;
-  authBtn.textContent = (auth.currentUser ?
-    (lang==='de'?'Abmelden':lang==='en'?'Sign out':'تسجيل الخروج') :
-    (lang==='de'?'Anmelden':lang==='en'?'Sign in':'تسجيل'));
-
-  // نصوص اليوم/الإعدادات/الشهر/التصدير
+  menuToggle.textContent=L.nav.menu; mnuDay.textContent=L.nav.day; mnuMonth.textContent=L.nav.month; mnuSettings.textContent=L.nav.settings; mnuExport.textContent=L.nav.export;
+  authBtn.textContent=(auth.currentUser?(lang==='de'?'Abmelden':lang==='en'?'Sign out':'تسجيل الخروج'):(lang==='de'?'Anmelden':lang==='en'?'Sign in':'تسجيل'));
   titleDay.textContent=L.day.title; hintDay.textContent=L.day.hint; lblDate.textContent=L.day.date; lblStart.textContent=L.day.start; lblEnd.textContent=L.day.end; lblBreak.textContent=L.day.break; k1.textContent=L.day.k1; k2.textContent=L.day.k2; k3.textContent=L.day.k3; k4.textContent=L.day.k4;
   titleSettings.textContent=L.settings.title; hintSettings.textContent=L.settings.hint; lblDaily.textContent=L.settings.daily; lblBreakDef.textContent=L.settings.brdef; applySettings.textContent=L.settings.apply;
   titleMonth.textContent=L.month.title; lblPickMonth.textContent=L.month.pick; document.getElementById('mk1').textContent=L.month.m1; document.getElementById('mk2').textContent=L.month.m2; document.getElementById('mk3').textContent=L.month.m3; refreshMonth.textContent=L.month.refresh; closeMonth.textContent=L.month.close;
   titleExport.textContent=L.export.title; lblScope.textContent=L.export.scope; lblFormat.textContent=L.export.format; expScope.options[0].text=L.export.optDay; expScope.options[1].text=L.export.optMonth; expFormat.options[0].text=L.export.png; expFormat.options[1].text=L.export.json; closeExport.textContent=L.export.cancel; doExport.textContent=L.export.do;
-
   localStorage.setItem(LS_LANG,lang);
   updateDayName();
   if(monthArea.dataset.built==='1'){buildMonthTableHead(lang);}
@@ -522,10 +468,8 @@ function showCard(card){[dayCard,settingsCard].forEach(el=>el.style.display='non
 function openExport(){exportModal.classList.add('open'); exportModal.setAttribute('aria-hidden','false');}
 
 function initApp(){
-  // عيّن تاريخ اليوم بشكل آمن
   try{dayDate.valueAsDate=new Date();}catch{dayDate.value=new Date().toISOString().slice(0,10);}
 
-  // Drawer
   menuToggle.onclick=()=>{
     const willOpen=!menuDrawer.classList.contains('open');
     menuDrawer.classList.toggle('open',willOpen);
@@ -541,21 +485,17 @@ function initApp(){
     }
   });
 
-  // Menu actions
   mnuDay.onclick=()=>{showCard(dayCard); menuDrawer.classList.remove('open');};
   mnuSettings.onclick=()=>{loadSettings(); showCard(settingsCard); menuDrawer.classList.remove('open');};
   mnuMonth.onclick=()=>{openMonth(); menuDrawer.classList.remove('open');};
   mnuExport.onclick=()=>{openExport(); menuDrawer.classList.remove('open');};
 
-  // Flags
   document.querySelectorAll('.btn-flag').forEach(b=>b.addEventListener('click',()=>{setLang(b.dataset.lang); setActiveLangUI(b.dataset.lang);} ));
   setActiveLangUI(currentLang);
 
-  // Inputs: حساب + حفظ تلقائي على أي تغيير مهم
   [dayStart,dayEnd,dayBreak].forEach(el=>el.addEventListener('input',()=>{compute(); saveDayLocal();}));
   dayDate.addEventListener('change',()=>{updateDayName(); loadDay(); saveDayLocal();});
 
-  // Settings + month + export
   applySettings.addEventListener('click',()=>{saveSettings(); compute();});
   refreshMonth.addEventListener('click',refreshMonthSummary);
   closeMonth.addEventListener('click',()=>monthModal.classList.remove('open'));
@@ -566,7 +506,6 @@ function initApp(){
     exportModal.classList.remove('open');
   });
 
-  // لغة + إعدادات + تحميل أولي
   setLang(currentLang);
   loadSettings();
   loadDay();
