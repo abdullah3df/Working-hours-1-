@@ -1,222 +1,498 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>Saaati — Home</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SteelPro | Isometric Master</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-core: #0f1115;
+            --bg-panel: #181b21;
+            --primary: #3b82f6;     /* أزرق هندسي */
+            --accent: #f59e0b;      /* برتقالي للتمييز */
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --border: #2d3342;
+            --surface-gradient: linear-gradient(145deg, #1f232b, #16181d);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; user-select: none; }
+
+        body {
+            background-color: var(--bg-core);
+            color: var(--text-main);
+            font-family: 'Tajawal', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- HEADER --- */
+        header {
+            height: 60px;
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            z-index: 10;
+        }
+
+        .logo { font-family: 'Chakra Petch', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--text-main); letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+        .logo i { color: var(--primary); font-size: 1.4rem; }
+
+        .lang-switch {
+            background: #000; color: #fff; border: 1px solid var(--border);
+            padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;
+        }
+
+        /* --- LAYOUT --- */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 340px 1fr 300px; /* يسار - وسط - يمين */
+            flex: 1;
+            height: calc(100vh - 60px);
+        }
+
+        /* --- LEFT PANEL (Controls) --- */
+        .panel {
+            background: var(--bg-panel);
+            border-left: 1px solid var(--border); /* RTL Logic handled by CSS var or dir */
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+        /* Fix borders for RTL specifically */
+        [dir="rtl"] .panel { border-left: 1px solid var(--border); border-right: none; }
+        [dir="ltr"] .panel { border-right: 1px solid var(--border); border-left: none; }
+
+        .section-label {
+            font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; font-weight: bold;
+        }
+
+        /* NEW: Type Selector (Tabs) instead of Select */
+        .type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5px;
+            background: #000;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .type-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.3s;
+            text-align: center;
+        }
+        .type-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .type-btn.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Size Selector */
+        select.modern-select {
+            width: 100%; background: var(--bg-core); border: 1px solid var(--border);
+            color: #fff; padding: 12px; border-radius: 6px; font-family: 'Chakra Petch';
+            font-size: 1rem; cursor: pointer;
+        }
+
+        /* Slider */
+        .slider-group { background: #000; padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+        input[type="range"] {
+            width: 100%; height: 4px; background: #333; appearance: none; margin-top: 10px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* --- CENTER (Canvas) --- */
+        .viewport {
+            position: relative;
+            background: radial-gradient(circle at 50% 120%, #2a303c 0%, #0d0f12 80%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+        
+        /* Grid Floor */
+        .floor-grid {
+            position: absolute; width: 200%; height: 200%;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transform: rotateX(60deg) translateY(100px) translateZ(-100px);
+            pointer-events: none;
+        }
+
+        svg { width: 90%; height: 80%; filter: drop-shadow(0 30px 40px rgba(0,0,0,0.6)); transition: all 0.2s ease-out; }
+
+        /* --- RIGHT PANEL (Results) --- */
+        .panel-right { border-left: none; background: var(--bg-panel); border-right: 1px solid var(--border); }
+        [dir="ltr"] .panel-right { border-left: 1px solid var(--border); border-right: none; }
+
+        .result-card {
+            background: linear-gradient(180deg, rgba(59,130,246,0.1) 0%, rgba(0,0,0,0) 100%);
+            border: 1px solid rgba(59,130,246,0.2);
+            border-radius: 12px; padding: 2rem 1rem; text-align: center; margin-bottom: 1rem;
+        }
+        
+        .big-number {
+            font-family: 'Chakra Petch', sans-serif; font-size: 3rem; font-weight: 700;
+            color: #fff; display: block; line-height: 1; margin-bottom: 5px;
+            text-shadow: 0 0 20px rgba(59,130,246,0.5);
+        }
+        .unit { color: var(--text-muted); font-size: 0.9rem; }
+
+        .info-row {
+            display: flex; justify-content: space-between; padding: 12px 0;
+            border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 0.9rem;
+        }
+        .info-row span:last-child { color: #fff; font-family: 'Chakra Petch'; font-weight: bold; }
+
+        /* Metallic Gradients in SVG Defs */
+        .face-front { fill: url(#metalFront); stroke: #555; stroke-width: 1px; }
+        .face-top   { fill: url(#metalTop); stroke: #444; stroke-width: 1px; }
+        .face-side  { fill: url(#metalSide); stroke: #333; stroke-width: 1px; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr; grid-template-rows: auto 400px auto; overflow-y: auto; height: auto; }
+            body { overflow: auto; height: auto; }
+            .viewport { height: 400px; order: -1; }
+        }
+    </style>
 </head>
 <body>
-  <!-- Topbar -->
-  <div class="topbar">
-    <div class="inner">
-      <button id="menuToggle" class="btn" aria-expanded="false">☰ Menu</button>
-      <div class="brand brand-badge">⏱️ <span id="brandTxt">Saaati</span></div>
-      <div id="userPill" class="user-pill">Guest</div>
-    </div>
-  </div>
 
-  <!-- Drawer Menu -->
-  <div id="menuDrawer" class="menu-drawer" aria-hidden="true">
-    <div class="menu-scroller">
-      <div class="menu-section">
-        <div class="menu-title" id="navTitle">Navigation</div>
-        <div class="menu-list">
-          <button id="mnuDay" class="btn">📅 Day</button>
-          <button id="mnuMonth" class="btn">🗓️ Monthly</button>
-          <button id="mnuSettings" class="btn">⚙️ Settings</button>
-          <button id="mnuExport" class="btn">📦 Export</button>
+    <header>
+        <div class="logo">
+            <i class="ri-shape-2-fill"></i> ISO-STEEL <span style="font-size:0.6rem; opacity:0.6; margin-top:4px;">PRO</span>
         </div>
-      </div>
-      <hr class="hr" />
-
-      <div class="menu-section">
-        <div class="menu-title" id="prefTitle">Preferences</div>
-        <div class="menu-row" id="langRow">
-          <button class="lang-chip" data-lang="en" data-active="true">🌐 EN</button>
-          <button class="lang-chip" data-lang="ar">🌐 AR</button>
-          <button class="lang-chip" data-lang="de">🌐 DE</button>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
-          <label for="darkToggle" style="font-weight:700" id="lblTheme">Dark mode</label>
-          <label class="switch" title="Dark mode">
-            <input type="checkbox" id="darkToggle">
-            <span class="slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <hr class="hr" />
-
-      <div class="menu-section">
-        <div class="menu-title" id="acctTitle">Account</div>
-        <div class="menu-list">
-          <button id="authBtn" class="btn">Sign out</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="wrap">
-    <!-- Day -->
-    <div class="card" id="dayCard">
-      <h1 id="titleDay">Daily Entry</h1>
-      <p class="small" id="hintDay">Enter start, end and break. Autosaved locally.</p>
-
-      <div class="date-row">
-        <div class="date-input">
-          <label id="lblDate">Date</label>
-          <input id="dayDate" class="input" type="date" />
-        </div>
-        <div class="pill" id="dayName">—</div>
-      </div>
-
-      <div class="time-grid">
-        <div class="time-box start">
-          <div class="title" id="lblStart">🟢 Clock In</div>
-          <input id="dayStart" class="input" type="time" step="60" inputmode="numeric" />
-        </div>
-        <div class="time-box end">
-          <div class="title" id="lblEnd">🔴 Clock Out</div>
-          <input id="dayEnd" class="input" type="time" step="60" inputmode="numeric" />
-        </div>
-        <div class="time-box break-col">
-          <div class="title" id="lblBreak">☕️ Break (min)</div>
-          <input id="dayBreak" class="input" type="number" min="0" step="5" value="30" />
-        </div>
-      </div>
-
-      <!-- Annotations -->
-      <div class="annot-grid">
-        <div class="form-field">
-          <label id="lblStatus">Day Status</label>
-          <select id="dayStatus" class="select">
-            <option value="work" selected>Work</option>
-            <option value="vacation">Vacation</option>
-            <option value="sick">Sick</option>
-            <option value="absent">Absent (Other)</option>
-          </select>
-        </div>
-        <div class="form-field" id="reasonWrap" style="display:none">
-          <label id="lblReason">Reason / Note</label>
-          <input id="dayReason" class="select" placeholder="Reason for absence..." />
-        </div>
-        <div class="form-field" style="grid-column:1 / -1">
-          <label id="lblTaskNote">Task Note (what you did)</label>
-          <textarea id="taskNote" class="textarea" placeholder="Brief note about tasks completed today..."></textarea>
-        </div>
-      </div>
-
-      <!-- KPIs -->
-      <div class="kpis">
-        <div class="kcard"><h3 id="k1">Net Today</h3><div class="val" id="dNet">0:00</div></div>
-        <div class="kcard"><h3 id="kWorkTitle">Work Hours</h3><div class="val" id="dWorkHours">0:00</div></div>
-        <div class="kcard"><h3 id="k2">Overtime</h3><div class="val" id="dOT">0:00</div></div>
-        <div class="kcard"><h3 id="k3">Daily Base (h)</h3><div class="val" id="dBase">8</div></div>
-      </div>
-    </div>
-
-    <!-- Settings -->
-    <div class="card" id="settingsCard" style="display:none">
-      <h1 id="titleSettings">Settings</h1>
-      <p class="small" id="hintSettings">Adjust defaults.</p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
-        <div>
-          <label id="lblDaily">Daily Base (hours)</label>
-          <input id="stDaily" class="input" type="number" step="0.25" min="0" value="8">
-        </div>
-        <div>
-          <label id="lblBreakDef">Default Break (min)</label>
-          <input id="stBreak" class="input" type="number" step="5" min="0" value="30">
-        </div>
-      </div>
-      <button id="applySettings" class="btn" style="margin-top:12px">Save</button>
-    </div>
-  </div>
-
-  <!-- Month modal -->
-  <div id="monthModal" class="modal" aria-hidden="true">
-    <div class="dialog">
-      <h2 id="titleMonth">Monthly Summary</h2>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <div><label class="small" id="lblPickMonth">Pick month</label><input type="month" id="monthPick" class="input" style="height:40px"></div>
-        <button id="refreshMonth" class="btn">Refresh</button>
-      </div>
-      <div id="monthArea" style="margin-top:12px"></div>
-      <div id="notesArea" style="margin-top:16px"></div>
-      <div class="kpis">
-        <div class="kcard"><h3 id="mk1">Month Total</h3><div class="val" id="mTotal">0:00</div></div>
-        <div class="kcard"><h3 id="mk2">Logged Days</h3><div class="val" id="mDays">0</div></div>
-        <div class="kcard"><h3 id="mk3">Avg/Day</h3><div class="val" id="mAvg">0:00</div></div>
-      </div>
-      <div class="actions"><button id="closeMonth" class="btn">Close</button></div>
-    </div>
-  </div>
-
-  <!-- Export modal -->
-  <div id="exportModal" class="modal" aria-hidden="true">
-    <div class="dialog" style="max-width:620px">
-      <h2 id="titleExport">Export</h2>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div>
-          <label id="lblScope">Scope</label>
-          <select id="expScope" class="input" style="height:40px">
-            <option value="day">Day</option>
-            <option value="month">Month</option>
-            <option value="biweek">Two Weeks</option>
-          </select>
-        </div>
-        <div>
-          <label id="lblFormat">Format</label>
-          <select id="expFormat" class="input" style="height:40px">
-            <option value="png">Image (PNG)</option>
-            <option value="json">JSON</option>
-          </select>
-        </div>
-        <div>
-          <label id="lblLang">Export Language</label>
-          <select id="expLang" class="input" style="height:40px">
-            <option value="en">English</option>
+        <select class="lang-switch" id="langSwitch">
             <option value="ar">العربية</option>
+            <option value="en">English</option>
             <option value="de">Deutsch</option>
-          </select>
-        </div>
-        <div id="biweekWrap" style="display:none">
-          <label id="lblBwStart">Two Weeks Start</label>
-          <input id="bwStart" type="date" class="input" />
-        </div>
-      </div>
-      <div class="actions" style="margin-top:10px">
-        <button id="closeExport" class="btn">Cancel</button>
-        <button id="doExport" class="btn">Export</button>
-      </div>
+        </select>
+    </header>
+
+    <div class="main-layout">
+        
+        <aside class="panel">
+            <div>
+                <div class="section-label" data-i18n="type">نوع المعدن (PROFILE TYPE)</div>
+                <div class="type-selector">
+                    <button class="type-btn active" onclick="setType('HEA')">HEA</button>
+                    <button class="type-btn" onclick="setType('HEB')">HEB</button>
+                    <button class="type-btn" onclick="setType('HEM')">HEM</button>
+                </div>
+            </div>
+
+            <div>
+                <div class="section-label" data-i18n="size">المقاس (SIZE)</div>
+                <select id="sizeSelect" class="modern-select">
+                    </select>
+            </div>
+
+            <div>
+                <div class="section-label" data-i18n="length">الطول (LENGTH)</div>
+                <div class="slider-group">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span id="lenDisplay" style="font-family:'Chakra Petch'; color:var(--accent); font-weight:bold;">6.0 m</span>
+                    </div>
+                    <input type="range" id="lenSlider" min="0.5" max="24" step="0.1" value="6.0">
+                </div>
+            </div>
+        </aside>
+
+        <main class="viewport">
+            <div class="floor-grid"></div>
+            <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                    <linearGradient id="metalFront" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#cbd5e1" />
+                        <stop offset="50%" style="stop-color:#94a3b8" />
+                        <stop offset="100%" style="stop-color:#64748b" />
+                    </linearGradient>
+                    
+                    <linearGradient id="metalTop" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#f1f5f9" /> <stop offset="100%" style="stop-color:#cbd5e1" />
+                    </linearGradient>
+
+                    <linearGradient id="metalSide" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#475569" /> <stop offset="50%" style="stop-color:#334155" />
+                        <stop offset="100%" style="stop-color:#1e293b" />
+                    </linearGradient>
+                </defs>
+
+                <g id="isoBeam" transform="translate(400, 300)">
+                    <path id="pathWebSide" class="face-side" d="" />
+                    
+                    <path id="pathBotFlangeTop" class="face-top" d="" />
+                    
+                    <path id="pathTopFlangeTop" class="face-top" d="" />
+
+                    <path id="pathFront" class="face-front" d="" />
+
+                    <path id="pathFlangeSide" class="face-side" d="" />
+                </g>
+
+                <g id="dimLines"></g>
+            </svg>
+        </main>
+
+        <aside class="panel panel-right">
+            <div class="section-label" data-i18n="results">النتائج الفورية</div>
+            
+            <div class="result-card">
+                <span class="big-number" id="resWeight">0.0</span>
+                <span class="unit" data-i18n="kg">كيلوغرام (Weight)</span>
+            </div>
+
+            <div style="margin-top:10px;">
+                <div class="info-row">
+                    <span data-i18n="h">الارتفاع (h)</span>
+                    <span id="valH">0 mm</span>
+                </div>
+                <div class="info-row">
+                    <span data-i18n="b">العرض (b)</span>
+                    <span id="valB">0 mm</span>
+                </div>
+                <div class="info-row">
+                    <span data-i18n="tw">سمك العصب (tw)</span>
+                    <span id="valTw">0 mm</span>
+                </div>
+                <div class="info-row">
+                    <span data-i18n="tf">سمك الجناح (tf)</span>
+                    <span id="valTf">0 mm</span>
+                </div>
+                <div class="info-row" style="border-bottom:none; margin-top:10px;">
+                    <span data-i18n="wm" style="color:var(--primary)">الوزن المتري</span>
+                    <span id="valWm" style="color:var(--primary)">0 kg/m</span>
+                </div>
+            </div>
+        </aside>
     </div>
-  </div>
 
-  <!-- Confirm Save Modal -->
-  <div id="confirmSaveModal" class="modal" aria-hidden="true">
-    <div class="dialog confirm-dialog">
-      <h2 id="csTitle">Save changes?</h2>
-      <p id="csBody" class="confirm-body">You made changes. Do you want to save them?</p>
-      <div class="actions">
-        <button id="csCancel" class="btn btn-danger">No</button>
-        <button id="csOk" class="btn btn-primary">Yes</button>
-      </div>
-    </div>
-  </div>
+    <script>
+        // --- CONFIG & STATE ---
+        let state = {
+            type: 'HEA',
+            size: '100',
+            length: 6.0,
+            lang: 'ar'
+        };
 
-  <!-- Toast -->
-  <div id="toast" class="toast">Saved ✅</div>
+        const db = {
+            HEA: { 100:{h:96,b:100,tw:5,tf:8,w:16.7}, 140:{h:133,b:140,tw:5.5,tf:8.5,w:24.7}, 200:{h:190,b:200,tw:6.5,tf:10,w:42.3}, 300:{h:290,b:300,tw:8.5,tf:14,w:88.3}, 400:{h:390,b:300,tw:11,tf:19,w:125}, 600:{h:590,b:300,tw:13,tf:25,w:178} },
+            HEB: { 100:{h:100,b:100,tw:6,tf:10,w:20.4}, 140:{h:140,b:140,tw:7,tf:12,w:33.7}, 200:{h:200,b:200,tw:9,tf:15,w:61.3}, 300:{h:300,b:300,tw:11,tf:19,w:117}, 400:{h:400,b:300,tw:13.5,tf:24,w:155}, 600:{h:600,b:300,tw:15.5,tf:30,w:212} },
+            HEM: { 100:{h:120,b:106,tw:12,tf:20,w:41.8}, 140:{h:160,b:146,tw:13,tf:22,w:63.2}, 200:{h:220,b:206,tw:15,tf:25,w:103}, 300:{h:340,b:310,tw:21,tf:39,w:238}, 400:{h:432,b:307,tw:21,tf:40,w:256}, 600:{h:620,b:305,tw:21,tf:40,w:285} }
+        };
 
-  <!-- html2canvas (export PNG) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
+        const i18n = {
+            ar: { type: "نوع المعدن", size: "المقاس", length: "الطول المطلوب", results: "النتائج", kg: "الوزن الكلي (كجم)", h: "الارتفاع (h)", b: "العرض (b)", tw: "سماكة العصب", tf: "سماكة الجناح", wm: "الوزن / متر" },
+            en: { type: "PROFILE TYPE", size: "SECTION SIZE", length: "LENGTH", results: "RESULTS", kg: "Total Weight (kg)", h: "Height (h)", b: "Width (b)", tw: "Web Thick", tf: "Flange Thick", wm: "Weight / m" },
+            de: { type: "PROFILTYP", size: "GRÖSSE", length: "LÄNGE", results: "ERGEBNISSE", kg: "Gesamtgewicht (kg)", h: "Höhe (h)", b: "Breite (b)", tw: "Stegdicke", tf: "Flanschdicke", wm: "Gewicht / m" }
+        };
 
-  <!-- Firebase compat (no modules) -->
-  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+        // --- DOM ---
+        const els = {
+            size: document.getElementById('sizeSelect'),
+            slider: document.getElementById('lenSlider'),
+            lenDisplay: document.getElementById('lenDisplay'),
+            resWeight: document.getElementById('resWeight'),
+            lang: document.getElementById('langSwitch'),
+            // Paths
+            pFront: document.getElementById('pathFront'),
+            pTop: document.getElementById('pathTopFlangeTop'),
+            pBot: document.getElementById('pathBotFlangeTop'),
+            pWeb: document.getElementById('pathWebSide'),
+            pSide: document.getElementById('pathFlangeSide'),
+            isoGroup: document.getElementById('isoBeam')
+        };
 
-  <!-- App -->
-  <script src="app.js"></script>
+        // --- INIT ---
+        function init() {
+            populateSizes();
+            els.size.addEventListener('change', (e) => { state.size = e.target.value; update(); });
+            els.slider.addEventListener('input', (e) => { state.length = e.target.value; update(); });
+            els.lang.addEventListener('change', (e) => { state.lang = e.target.value; updateLang(); });
+            
+            updateLang();
+            update();
+        }
+
+        // --- LOGIC ---
+        window.setType = (type) => {
+            state.type = type;
+            // Update UI Buttons
+            document.querySelectorAll('.type-btn').forEach(b => {
+                b.classList.remove('active');
+                if(b.innerText === type) b.classList.add('active');
+            });
+            populateSizes();
+            update();
+        };
+
+        function populateSizes() {
+            els.size.innerHTML = '';
+            Object.keys(db[state.type]).forEach(k => {
+                let opt = document.createElement('option');
+                opt.value = k;
+                opt.innerText = `${state.type} ${k}`;
+                els.size.appendChild(opt);
+            });
+            state.size = els.size.options[0].value;
+        }
+
+        function updateLang() {
+            const l = state.lang;
+            document.documentElement.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.getAttribute('data-i18n');
+                if(i18n[l][k]) el.innerText = i18n[l][k];
+            });
+        }
+
+        function update() {
+            // Data Fetch
+            const d = db[state.type][state.size];
+            const len = parseFloat(state.length);
+            
+            // Calc
+            const total = (d.w * len).toFixed(1);
+            els.resWeight.innerText = total;
+            els.lenDisplay.innerText = len + ' m';
+            
+            // Info
+            document.getElementById('valH').innerText = d.h;
+            document.getElementById('valB').innerText = d.b;
+            document.getElementById('valTw').innerText = d.tw;
+            document.getElementById('valTf').innerText = d.tf;
+            document.getElementById('valWm').innerText = d.w;
+
+            // DRAW ISOMETRIC
+            drawIsometric(d, len);
+        }
+
+        function drawIsometric(d, lenVal) {
+            // We want to draw the beam angled so we see Front, Top, and Side.
+            // Isometric math simplified:
+            // x_screen = x - z
+            // y_screen = y * 0.5 + z * 0.5 (very rough approx for ease)
+            // Better approach: Pure 2D projection logic
+            
+            // 1. Scale inputs to screen pixels
+            // Max height ~ 200px
+            const scale = 180 / Math.max(d.h, d.b);
+            const H = d.h * scale;
+            const B = d.b * scale;
+            const tf = d.tf * scale;
+            const tw = d.tw * scale;
+            
+            // Length Extrusion Vector
+            // Let's make it go Up-Right (Top-Right direction)
+            // Max length (24m) = 400px extrusion
+            const maxPx = 400;
+            const extrusion = (lenVal / 24) * maxPx;
+            
+            // Angle of extrusion: -30 degrees (X positive, Y negative)
+            const angle = -30 * (Math.PI / 180); 
+            const dx = extrusion * Math.cos(angle); // Move Right
+            const dy = extrusion * Math.sin(angle); // Move Up
+
+            // Front Face Coords (Centered at 0,0 locally)
+            const xL = -B/2, xR = B/2;
+            const yT = -H/2, yB = H/2;
+            const wL = -tw/2, wR = tw/2;
+
+            // Helper to generate Path String
+            const rectPath = (x1,y1, x2,y2, x3,y3, x4,y4) => {
+                return `M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} L ${x4} ${y4} Z`;
+            };
+
+            // 1. FRONT FACE (The H)
+            const pathF = `
+                M ${xL} ${yT} H ${xR} V ${yT+tf} H ${wR} V ${yB-tf} H ${xR} V ${yB}
+                H ${xL} V ${yB-tf} H ${wL} V ${yT+tf} H ${xL} Z
+            `;
+            els.pFront.setAttribute('d', pathF);
+
+            // 2. CONNECTING FACES (The Length)
+            
+            // Top Surface (Top of Top Flange)
+            // Points: Front-Top-Left, Front-Top-Right, Back-Top-Right, Back-Top-Left
+            els.pTop.setAttribute('d', rectPath(
+                xL, yT, 
+                xR, yT, 
+                xR+dx, yT+dy, 
+                xL+dx, yT+dy
+            ));
+
+            // Right Side of Top Flange
+            els.pSide.setAttribute('d', rectPath(
+                xR, yT,
+                xR, yT+tf,
+                xR+dx, yT+tf+dy,
+                xR+dx, yT+dy
+            ));
+
+            // Right Side of Bottom Flange (Simulated, usually visible)
+            // We append this to pSide logic or a new path. Let's create a combined side path for simplicity or separate
+            // Let's assume we view from slightly above-right.
+            // Right Side of Web
+            els.pWeb.setAttribute('d', rectPath(
+                wR, yT+tf,
+                wR, yB-tf,
+                wR+dx, yB-tf+dy,
+                wR+dx, yT+tf+dy
+            ));
+
+            // Top Surface of Bottom Flange
+            els.pBot.setAttribute('d', rectPath(
+                wR, yB-tf,
+                xR, yB-tf,
+                xR+dx, yB-tf+dy,
+                wR+dx, yB-tf+dy
+            ));
+            
+            // Also need Right Side of Bottom Flange
+            const botFlangeSide = rectPath(
+                xR, yB-tf,
+                xR, yB,
+                xR+dx, yB+dy,
+                xR+dx, yB-tf+dy
+            );
+            // Append to pSide d attribute
+            let currentD = els.pSide.getAttribute('d');
+            els.pSide.setAttribute('d', currentD + " " + botFlangeSide);
+
+            // Center the whole Group
+            // If length is huge, we need to shift the group Left and Down so it stays centered
+            const offsetX = 400 - (dx/2);
+            const offsetY = 300 - (dy/2);
+            els.isoGroup.setAttribute('transform', `translate(${offsetX}, ${offsetY})`);
+        }
+
+        init();
+    </script>
 </body>
 </html>
